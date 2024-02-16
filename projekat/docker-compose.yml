@@ -2,6 +2,20 @@ version: '3.8'
 
 services:
 
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./public:/var/www/html/public
+    depends_on:
+      - app
+      - db
+    networks:
+      - fis-network
+
   db:
     image: mysql:8.0
     container_name: mysql
@@ -12,7 +26,6 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME}
     networks:
       - fis-network
 
@@ -30,23 +43,11 @@ services:
       - ./docker/php/dev/conf.d/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini
     expose:
       - "9000"
+    depends_on:
+      - db
     networks:
       - fis-network
 
-
-  nginx:
-      image: nginx:alpine
-      container_name: nginx
-      ports:
-          - "80:80"
-      volumes:
-          - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
-          - ./public:/var/www/html/public
-      depends_on:
-          - app
-          - db
-      networks:
-          - fis-network
 
 volumes:
   dbdata:
