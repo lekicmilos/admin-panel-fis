@@ -1,0 +1,17 @@
+FROM php:8.3-fpm
+ARG user
+ARG uid
+
+RUN apt update && apt install -y git curl zip unzip
+
+RUN docker-php-ext-install pdo pdo_mysql
+RUN pecl install xdebug \
+    && docker-php-ext-enable xdebug
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+RUN useradd -G www-data,root -u $uid -d /home/$user $user
+RUN mkdir -p /home/$user/.composer && \
+    chown -R $user:$user /var/www
+WORKDIR /var/www
+USER $user
