@@ -21,8 +21,8 @@ class Katedra extends Model
     {
         return $this->belongsToMany(Zaposleni::class,
             'angazovanje_na_katedri',
-            'zaposleni_id',
-            'katedra_id')
+            'katedra_id',
+            'zaposleni_id')
             ->withPivot('datum_od', 'datum_do');
     }
 
@@ -30,8 +30,8 @@ class Katedra extends Model
     {
         return $this->belongsToMany(Zaposleni::class,
             'pozicije_na_katedri',
-            'zaposleni_id',
-            'katedra_id')
+            'katedra_id',
+            'zaposleni_id')
             ->withPivot('pozicija', 'datum_od', 'datum_do');
     }
 

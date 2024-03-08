@@ -28,8 +28,8 @@ class Zaposleni extends Model
     {
         return $this->belongsToMany(Katedra::class,
             'angazovanje_na_katedri',
-            'katedra_id',
-            'zaposleni_id')
+            'zaposleni_id',
+            'katedra_id')
             ->withPivot('datum_od', 'datum_do');
     }
 
@@ -37,8 +37,8 @@ class Zaposleni extends Model
     {
         return $this->belongsToMany(Zaposleni::class,
             'pozicije_na_katedri',
-            'katedra_id',
-            'zaposleni_id')
+            'zaposleni_id',
+            'katedra_id')
             ->withPivot('pozicija', 'datum_od', 'datum_do');
     }
 

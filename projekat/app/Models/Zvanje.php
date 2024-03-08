@@ -21,8 +21,8 @@ class Zvanje extends Model
     {
         return $this->belongsToMany(Zaposleni::class,
         'izbor_u_zvanje',
-        'zaposleni_id',
-        'zvanje_id')
+        'zvanje_id',
+        'zaposleni_id')
             ->withPivot('datum_od', 'datum_do');
     }
 }
