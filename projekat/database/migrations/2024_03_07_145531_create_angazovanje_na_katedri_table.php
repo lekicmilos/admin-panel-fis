@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->date("datum_od");
             $table->date("datum_do")->nullable();
-            $table->foreignId("katedra")->references("id")->on("katedra");
-            $table->foreignId("zaposleni")->references("id")->on("zaposleni");
+            $table->foreignId("katedra_id")->references("id")->on("katedra");
+            $table->foreignId("zaposleni_id")->references("id")->on("zaposleni");
         });
     }
 
@@ -26,11 +26,11 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('angazovanje_na_katedri', function (Blueprint $table){
-            $table->dropForeign(['katedra']);
-            $table->dropColumn(['katedra']);
+            $table->dropForeign(['katedra_id']);
+            $table->dropColumn(['katedra_id']);
 
-            $table->dropForeign(['zaposleni']);
-            $table->dropColumn(['zaposleni']);
+            $table->dropForeign(['zaposleni_id']);
+            $table->dropColumn(['zaposleni_id']);
         });
         Schema::dropIfExists('angazovanje_na_katedri');
     }
