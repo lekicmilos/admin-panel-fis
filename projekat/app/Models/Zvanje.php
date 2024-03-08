@@ -4,21 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\ZaposleniZvanje;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Zvanje extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
-        "naziv",
-        "nivo"
+    protected $fillable = [
+        'naziv_zvanja',
+        'nivo'
     ];
 
-    public function zaposleniZvanja()
+    public function zaposleni() : BelongsToMany
     {
-        return $this->hasMany(ZaposleniZvanje::class);
+        return $this->belongsToMany(Zaposleni::class,
+        'izbor_u_zvanje',
+        'zaposleni_id',
+        'zvanje_id')
+            ->withPivot('datum_od', 'datum_do');
     }
 }
-
-?>

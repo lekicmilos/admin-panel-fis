@@ -4,28 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Glavni;
-use App\Models\Angazovanje;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Katedra extends Model
 {
     use HasFactory;
 
-    protected $fillable=[
-        "naziv",
-        "aktivno"
+    protected $fillable = [
+        'naziv_katedre',
+        'aktivna'
     ];
 
-    public function glavni()
+    public function angazovanje(): BelongsToMany
     {
-        return $this->hasMany(Glavni::class);
+        return $this->belongsToMany(Zaposleni::class,
+            'angazovanje_na_katedri',
+            'zaposleni_id',
+            'katedra_id')
+            ->withPivot('datum_od', 'datum_do');
     }
 
-    public function angazovanje()
+    public function pozicije(): BelongsToMany
     {
-        return $this->belongsTo(Angazovanje::class);
+        return $this->belongsToMany(Zaposleni::class,
+            'pozicije_na_katedri',
+            'zaposleni_id',
+            'katedra_id')
+            ->withPivot('pozicija', 'datum_od', 'datum_do');
     }
 
 }
-
-?>
