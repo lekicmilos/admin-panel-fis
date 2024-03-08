@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use mysql_xdevapi\Table;
 
 class Zaposleni extends Model
 {
     use HasFactory;
+
+    protected $table = 'zaposleni';
 
     protected $fillable = [
         'ime',

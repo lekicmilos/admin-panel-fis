@@ -10,6 +10,8 @@ class Zvanje extends Model
 {
     use HasFactory;
 
+    protected $table = 'zvanje';
+
     protected $fillable = [
         'naziv_zvanja',
         'nivo'

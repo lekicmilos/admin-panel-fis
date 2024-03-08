@@ -10,6 +10,8 @@ class Katedra extends Model
 {
     use HasFactory;
 
+    protected $table = 'katedra';
+
     protected $fillable = [
         'naziv_katedre',
         'aktivna'
