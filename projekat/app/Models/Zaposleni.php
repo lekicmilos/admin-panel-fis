@@ -13,6 +13,8 @@ class Zaposleni extends Model
 
     protected $table = 'zaposleni';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'ime',
         'prezime',

@@ -12,6 +12,8 @@ class Katedra extends Model
 
     protected $table = 'katedra';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'naziv_katedre',
         'aktivna'

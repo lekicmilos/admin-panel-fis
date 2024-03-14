@@ -12,6 +12,8 @@ class Zvanje extends Model
 
     protected $table = 'zvanje';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'naziv_zvanja',
         'nivo'
