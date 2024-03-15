@@ -21,18 +21,35 @@ class ZvanjeService
         $this->zvanjeRepository = $zvanjeRepository;
     }
 
-    public function store($data)
+    protected function validator($data)
     {
-        $validator = Validator::make($data, [
+         // dodatna validacija, da li treba jos nesto?
+        return Validator::make($data, [
             'naziv' => 'required',
             'nivo' => 'required',
         ]);
+    }
+
+    public function store($data)
+    {
+        $validator = $this->validator($data);
 
         if ($validator->fails()) {
-            throw new InvalidArgumentException($validator->errors()->first());
+            return $validator;
         }
 
         return $this->zvanjeRepository->store($data);
+    }
+
+    public function update($zvanje, $data)
+    {
+        $validator = $this->validator($data);
+
+        if ($validator->fails()) {
+            return $validator;
+        }
+
+        return $this->zvanjeRepository->update($zvanje, $data);
     }
 
 

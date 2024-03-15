@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreZvanjeRequest;
 use App\Models\Zvanje;
 use App\Services\ZvanjeService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Validator;
 use Mockery\Exception;
 
 class ZvanjeController extends Controller
@@ -31,21 +34,50 @@ class ZvanjeController extends Controller
         return view('zvanje.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreZvanjeRequest $request)
     {
-//        dd($request);
-        $data = $request->only([
+//        dd($request)
+
+        $validated = $request->safe()->only([
             'naziv',
             'nivo'
         ]);
 
-        try {
-            $this->zvanjeService->store($data);
-        } catch (Exception $e) {
-            //TODO error handling
+
+        $result = $this->zvanjeService->store($validated);
+
+        if($result instanceof Validator && $result->fails()){
+            $err_msgs = $result->errors();
+            Log::error($err_msgs);
+            return back()->withErrors($err_msgs);
         }
+
 
         return redirect(route('zvanje.index'));
     }
+
+    public function edit(Zvanje $zvanje)
+    {
+        return view('zvanje.edit', ['zvanje' => $zvanje]);
+    }
+
+    public function update(Zvanje $zvanje, StoreZvanjeRequest $request) {
+        $validated = $request->safe()->only([
+            'naziv',
+            'nivo'
+        ]);
+
+        $this->zvanjeService->update($zvanje, $validated);
+        //$zvanje->update($validated);
+
+        return redirect(route('zvanje.index'))->with('success', 'Zvanje uspešno izmenjeno');
+    }
+
+    public function destroy(Zvanje $zvanje) {
+        $zvanje->delete();
+
+        return redirect(route('zvanje.index'))->with('success', 'Zvanje uspešno obrisano');
+    }
+
 
 }

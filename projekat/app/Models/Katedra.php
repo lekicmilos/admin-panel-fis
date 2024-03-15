@@ -10,9 +10,8 @@ class Katedra extends Model
 {
     use HasFactory;
 
-    protected $table = 'katedra';
-
-    public $timestamps = false;
+    private const table_name = 'katedra';
+    protected $table = self::table_name;
 
     protected $fillable = [
         'naziv_katedre',

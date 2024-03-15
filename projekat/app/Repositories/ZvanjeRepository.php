@@ -29,4 +29,14 @@ class ZvanjeRepository
 
         return $zvanje->fresh();
     }
+
+    public function update($zvanje, $data)
+    {
+        $zvanje->naziv_zvanja = $data['naziv'];
+        $zvanje->nivo = $data['nivo'];
+
+        $zvanje->update();
+
+        return $zvanje;
+    }
 }

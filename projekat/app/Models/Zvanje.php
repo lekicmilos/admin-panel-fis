@@ -10,9 +10,8 @@ class Zvanje extends Model
 {
     use HasFactory;
 
-    protected $table = 'zvanje';
-
-    public $timestamps = false;
+    private const table_name = 'zvanje';
+    protected $table = self::table_name;
 
     protected $fillable = [
         'naziv_zvanja',

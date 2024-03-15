@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("naziv_zvanja");
             $table->string("nivo");
+            $table->timestamps();
         });
     }
 

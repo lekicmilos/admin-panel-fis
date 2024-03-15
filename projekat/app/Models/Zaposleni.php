@@ -11,9 +11,8 @@ class Zaposleni extends Model
 {
     use HasFactory;
 
-    protected $table = 'zaposleni';
-
-    public $timestamps = false;
+    private const table_name = 'zaposleni';
+    protected $table = self::table_name;
 
     protected $fillable = [
         'ime',

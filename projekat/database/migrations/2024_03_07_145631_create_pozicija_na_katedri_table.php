@@ -15,9 +15,10 @@ return new class extends Migration
             $table->id();
             $table->date("datum_od");
             $table->date("datum_do")->nullable();
-            $table->enum("pozicija", ["Sef katedre", "Zamenik katedre"]);
+            $table->enum("pozicija", ["Šef katedre", "Zamenik katedre"]);
             $table->foreignId("zaposleni_id")->references("id")->on("zaposleni");
             $table->foreignId("katedra_id")->references("id")->on("katedra");
+            $table->timestamps();
         });
     }
 

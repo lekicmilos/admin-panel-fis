@@ -26,6 +26,8 @@ services:
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
     networks:
       - fis-network
 

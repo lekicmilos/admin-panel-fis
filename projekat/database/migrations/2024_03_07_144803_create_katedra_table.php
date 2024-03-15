@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("naziv_katedre");
             $table->boolean("aktivna");
+            $table->timestamps();
         });
     }
 

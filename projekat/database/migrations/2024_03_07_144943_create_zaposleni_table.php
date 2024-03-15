@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer("fis_broj")->unique();
             $table->boolean("u_penziji");
             $table->date("datum_penzije")->nullable();
+            $table->timestamps();
         });
     }
 

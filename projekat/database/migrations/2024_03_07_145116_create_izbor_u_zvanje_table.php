@@ -17,6 +17,7 @@ return new class extends Migration
             $table->date("datum_do")->nullable();
             $table->foreignId("zvanje_id")->references("id")->on("zvanje");
             $table->foreignId("zaposleni_id")->references("id")->on("zaposleni");
+            $table->timestamps();
         });
     }
 
