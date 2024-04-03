@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\KatedraController;
 use App\Http\Controllers\ZvanjeController;
 use Illuminate\Support\Facades\Route;
 
@@ -13,3 +14,6 @@ Route::post('/zvanje', [ZvanjeController::class, 'store'])->name('zvanje.store')
 Route::get('/zvanje/{zvanje}/edit', [ZvanjeController::class, 'edit'])->name('zvanje.edit');
 Route::put('/zvanje/{zvanje}/update', [ZvanjeController::class, 'update'])->name('zvanje.update');
 Route::delete('/zvanje/{zvanje}/destroy', [ZvanjeController::class, 'destroy'])->name('zvanje.destroy');
+
+Route::get('/katedra/create', [KatedraController::class, 'create'])->name('katedra.create');
+Route::post('/katedra', [KatedraController::class, 'store'])->name('katedra.store');
