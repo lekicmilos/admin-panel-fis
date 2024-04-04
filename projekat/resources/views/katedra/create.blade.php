@@ -55,11 +55,11 @@
                 </td>
 
                 <td class="">
-                    <input name="datum_od_sef" id="datum-od-sef" type="date" value="" required/>
+                    <input name="sef_datum_od" id="datum-od-sef" type="date" value="" required/>
                 </td>
 
                 <td class="">
-                    <input name="datum_do_sef" id="datum-do-sef" type="date" value=""/>
+                    <input name="sef_datum_do" id="datum-do-sef" type="date" value=""/>
                 </td>
             </tr>
         </table>
@@ -79,11 +79,11 @@
                 </td>
 
                 <td class="">
-                    <input name="datum_od_zamenik" id="datum-od-zamenik" type="date" value="" required/>
+                    <input name="zamenik_datum_od" id="datum-od-zamenik" type="date" value="" required/>
                 </td>
 
                 <td class="">
-                    <input name="datum_do_zamenik" id="datum-do-zamenik" type="date" value=""/>
+                    <input name="zamenik_datum_do" id="datum-do-zamenik" type="date" value=""/>
                 </td>
             </tr>
         </table>
@@ -115,25 +115,24 @@
 
                 let dynamicRowHTML = `
                 <tr class="rowClass">
-                    <td class="zap-id">
+                    `/*<td class="zap-id">
                         <input name="zaposleni_id[]" type="hidden" value=${zap_id} />
-                    </td>
+                    </td>*/+`
 
                     <td class="">
                         ${zap_ime}
                     </td>
 
                     <td class="">
-                        <input name="datum_od[]" id="datum-od" type="date" value="" required/>
+                        <input name="zaposleni[${zap_id}][datum_od]" id="datum-od" type="date" value="" required/>
                     </td>
 
                     <td class="">
-                        <input name="datum_do[]" id="datum-do" type="date" value=""/>
+                        <input name="zaposleni[${zap_id}][datum_do]" id="datum-do" type="date" value=""/>
                     </td>
 
                     <td class="">
-                        <button class="remove" type="button">Obrisi
-                        </button>
+                        <button class="remove" type="button" id="${zap_id}">Obrisi</button>
                     </td>
                 </tr>`;
 
@@ -145,7 +144,7 @@
         // Brisanje reda na dugme
         $('#tbody').on('click', '.remove', function () {
             // brisanje idja iz liste
-            const deleted_id = $(this).parent('td').siblings('td.zap-id').children('input')[0].value;
+            const deleted_id = $(this).id;
             zap_ids.splice(zap_ids.indexOf(deleted_id), 1);
 
             // uklanjanje reda

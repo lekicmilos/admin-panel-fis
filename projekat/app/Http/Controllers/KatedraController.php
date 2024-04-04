@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreKatedraRequest;
 use App\Models\Katedra;
 use App\Models\Zaposleni;
 use Illuminate\Http\Request;
@@ -32,7 +33,7 @@ class KatedraController extends Controller
         return view('katedra.create', ['zaposleni' => $zaposleni]);
     }
 
-    public function store(Request $request)
+    public function store(StoreKatedraRequest $request)
     {
         dd($request);
     }
