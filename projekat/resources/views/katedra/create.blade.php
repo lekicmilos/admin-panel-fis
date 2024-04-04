@@ -22,13 +22,9 @@
     </div>
 
     <div>
-        <label for="pretraga-zap">Pretraži zaposlenog</label>
-        <select id="pretraga-zap" name="pretraga-zap" >
-            @foreach($zaposleni as $zap)
-                <option value="{{$zap->id}}">{{$zap->ime}} {{$zap->srednje_slovo}}. {{$zap->prezime}}</option>
-            @endforeach
+        <label>Pretraži zaposlenog</label>
+        <x-pretraga-zaposlenog id="pretraga-zap" name="" :zaposleni="$zaposleni"></x-pretraga-zaposlenog>
 
-        </select>
         <button id="dodaj-zap" type="button">Dodaj zaposlenog</button>
 
         <div class="tabela-zap">
@@ -39,12 +35,58 @@
                     <th>Datum završetka angažovanja</th>
                 </tr>
 
-                <tbody id="tbody">
-
-                </tbody>
+                <tbody id="tbody"></tbody>
 
             </table>
         </div>
+    </div>
+
+    <div class="sef-katedre">
+        <table>
+            <tr>
+                <th>Šef</th>
+                <th>Datum angažovanja</th>
+                <th>Datum završetka angažovanja</th>
+            </tr>
+
+            <tr>
+                <td class="">
+                    <x-pretraga-zaposlenog id="pretraga-sef" name="sef_id" :zaposleni="$zaposleni"></x-pretraga-zaposlenog>
+                </td>
+
+                <td class="">
+                    <input name="datum_od_sef" id="datum-od-sef" type="date" value="" required/>
+                </td>
+
+                <td class="">
+                    <input name="datum_do_sef" id="datum-do-sef" type="date" value=""/>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="zamenik-katedre">
+        <table>
+            <tr>
+                <th>Zamenik</th>
+                <th>Datum angažovanja</th>
+                <th>Datum završetka angažovanja</th>
+            </tr>
+
+            <tr>
+                <td class="">
+                    <x-pretraga-zaposlenog id="pretraga-zamenik" name="zamenik_id" :zaposleni="$zaposleni"></x-pretraga-zaposlenog>
+                </td>
+
+                <td class="">
+                    <input name="datum_od_zamenik" id="datum-od-zamenik" type="date" value="" required/>
+                </td>
+
+                <td class="">
+                    <input name="datum_do_zamenik" id="datum-do-zamenik" type="date" value=""/>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div>
@@ -102,8 +144,11 @@
 
         // Brisanje reda na dugme
         $('#tbody').on('click', '.remove', function () {
+            // brisanje idja iz liste
             const deleted_id = $(this).parent('td').siblings('td.zap-id').children('input')[0].value;
             zap_ids.splice(zap_ids.indexOf(deleted_id), 1);
+
+            // uklanjanje reda
             $(this).parent('td').parent('tr.rowClass').remove();
 
         });
