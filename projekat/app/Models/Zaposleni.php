@@ -31,16 +31,18 @@ class Zaposleni extends Model
             'angazovanje_na_katedri',
             'zaposleni_id',
             'katedra_id')
-            ->withPivot('datum_od', 'datum_do');
+            ->withPivot('datum_od', 'datum_do')
+            ->withTimestamps();
     }
 
-    public function pozicije(): BelongsToMany
+    public function pozicija(): BelongsToMany
     {
         return $this->belongsToMany(Zaposleni::class,
-            'pozicije_na_katedri',
+            'pozicija_na_katedri',
             'zaposleni_id',
             'katedra_id')
-            ->withPivot('pozicija', 'datum_od', 'datum_do');
+            ->withPivot('pozicija', 'datum_od', 'datum_do')
+            ->withTimestamps();
     }
 
     public function zvanja(): BelongsToMany

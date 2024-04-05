@@ -1,4 +1,10 @@
-<h1>Nova katedra</h1>
+<h1>
+    @if($method=='post')
+        Nova katedra
+    @else
+        Izmeni katedru
+    @endif
+</h1>
 
 <div>
     @if($errors->any())
@@ -11,10 +17,10 @@
     @endif
 </div>
 
-<form action="{{route('katedra.store')}}" method="post">
+<form action="{{route('katedra.store')}}" method="{{$method}}">
 
     @csrf
-    @method('post')
+    @method($method)
 
     <div>
         <label for="naziv">Naziv</label>
@@ -115,10 +121,6 @@
 
                 let dynamicRowHTML = `
                 <tr class="rowClass">
-                    `/*<td class="zap-id">
-                        <input name="zaposleni_id[]" type="hidden" value=${zap_id} />
-                    </td>*/+`
-
                     <td class="">
                         ${zap_ime}
                     </td>
