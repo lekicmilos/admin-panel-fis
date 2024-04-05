@@ -15,5 +15,8 @@ Route::get('/zvanje/{zvanje}/edit', [ZvanjeController::class, 'edit'])->name('zv
 Route::put('/zvanje/{zvanje}/update', [ZvanjeController::class, 'update'])->name('zvanje.update');
 Route::delete('/zvanje/{zvanje}/destroy', [ZvanjeController::class, 'destroy'])->name('zvanje.destroy');
 
+Route::get('/katedra', [KatedraController::class, 'index'])->name('katedra.index');
 Route::get('/katedra/create', [KatedraController::class, 'create'])->name('katedra.create');
 Route::post('/katedra', [KatedraController::class, 'store'])->name('katedra.store');
+Route::get('/katedra/{katedra_id}/edit', [KatedraController::class, 'edit'])->name('katedra.edit');
+Route::put('/katedra/{katedra_id}/update', [KatedraController::class, 'update'])->name('katedra.update');

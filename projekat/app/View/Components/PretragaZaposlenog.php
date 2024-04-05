@@ -15,7 +15,8 @@ class PretragaZaposlenog extends Component
     public function __construct(
         public $id,
         public $name,
-        public $zaposleni
+        public $zaposleni,
+        public $selected
     )
     {
         //
