@@ -2,7 +2,9 @@
 
 namespace App\Repositories;
 
+use App\DTO\KatedraDTO;
 use App\Models\Katedra;
+use App\Models\Pozicija;
 use App\Models\Zvanje;
 
 class KatedraRepository
@@ -20,46 +22,82 @@ class KatedraRepository
         $this->katedra = $katedra;
     }
 
-    public function store($data)
+    public function store(KatedraDTO $data)
     {
         $katedra = new $this->katedra;
-        $katedra->naziv_katedre = $data['naziv'];
+        $katedra->naziv_katedre = $data->naziv;
         $katedra->aktivna = true;
 
         $katedra->save();
 
-        /*
-        zaposleni niz u formi
-        [ id_zap => ['datum_od' => ..., 'datum_do' => ...],
-          ... ]
-        */
-        $katedra->angazovanje()->attach($data['zaposleni']);
+        $zaposleni = [];
+        foreach ($data->zaposleni as $zap)
+        {
+            $zaposleni[$zap->id] = [
+                'datum_od' => $zap->datum_od,
+                'datum_do' => $zap->datum_do
+            ];
+        }
+
+        $katedra->angazovanje()->attach($zaposleni);
 
         $katedra->pozicija()->attach([
-            $data['sef_id'] => [
-                'pozicija' => 'Šef katedre',
-                'datum_od' => $data['sef_datum_od'],
-                'datum_do' => $data['sef_datum_do']
+            $data->sef->id => [
+                'pozicija' => Pozicija::Sef,
+                'datum_od' => $data->sef->datum_od,
+                'datum_do' => $data->sef->datum_do
             ],
 
-            $data['zamenik_id'] => [
-                'pozicija' => 'Zamenik katedre',
-                'datum_od' => $data['zamenik_datum_od'],
-                'datum_do' => $data['zamenik_datum_do']
+            $data->zamenik->id => [
+                'pozicija' => Pozicija::Zamenik,
+                'datum_od' => $data->zamenik->datum_od,
+                'datum_do' => $data->zamenik->datum_do
             ]
         ]);
-
 
         return $katedra->fresh();
     }
 
-    public function update($zvanje, $data)
+    public function update(Katedra $katedra, KatedraDTO $data)
     {
-        $zvanje->naziv_zvanja = $data['naziv'];
+        //$katedra = new $this->katedra;
+        $katedra->naziv_katedre = $data->naziv;
+        $katedra->aktivna = true;
+
+        $katedra->update();
+
+        $zaposleni = [];
+        foreach ($data->zaposleni as $zap)
+        {
+            $zaposleni[$zap->id] = [
+                'datum_od' => $zap->datum_od,
+                'datum_do' => $zap->datum_do
+            ];
+        }
+
+        $katedra->angazovanje()->sync($zaposleni);
+
+        $katedra->pozicija()->sync([
+            $data->sef->id => [
+                'pozicija' => Pozicija::Sef,
+                'datum_od' => $data->sef->datum_od,
+                'datum_do' => $data->sef->datum_do
+            ],
+
+            $data->zamenik->id => [
+                'pozicija' => Pozicija::Zamenik,
+                'datum_od' => $data->zamenik->datum_od,
+                'datum_do' => $data->zamenik->datum_do
+            ]
+        ]);
+
+        return $katedra;
+
+        /*$zvanje->naziv_zvanja = $data['naziv'];
         $zvanje->nivo = $data['nivo'];
 
         $zvanje->update();
 
-        return $zvanje;
+        return $zvanje;*/
     }
 }

@@ -31,7 +31,7 @@ class KatedraController extends Controller
 
         $katedreDTO = [];
         foreach ($katedre as $katedra) {
-            $katedreDTO[] = tap(new KatedraDTO)->fromModel($katedra);
+            $katedreDTO[] = $this->katedraService->toDTO($katedra);
         }
         return view('katedra.index', ['katedre' => $katedreDTO]);
     }
@@ -45,14 +45,9 @@ class KatedraController extends Controller
 
     public function store(StoreKatedraRequest $request)
     {
-        //dd($request);
-        /*$validated = $request->safe()->only([
-            'naziv',
-            'nivo'
-        ]);*/
+        $katedraDTO = $request->toDTO();
 
-
-        $result = $this->katedraService->store($request);
+        $result = $this->katedraService->store($katedraDTO);
 
         /*if($result instanceof Validator && $result->fails()){
             $err_msgs = $result->errors();
@@ -65,12 +60,17 @@ class KatedraController extends Controller
     public function edit(int $katedra_id)
     {
         $zaposleni = Zaposleni::all();
-        $katedra = tap(new KatedraDTO())->fromModel(Katedra::find($katedra_id));
-        return view('katedra.create', ['method' => 'put', 'zaposleni' => $zaposleni, 'katedra' => $katedra]);
+        $katedra = Katedra::findOrFail($katedra_id);
+        $katedraDTO = $this->katedraService->toDTO($katedra);
+        return view('katedra.create', ['method' => 'put', 'zaposleni' => $zaposleni, 'katedra' => $katedraDTO]);
     }
 
     public function update(int $katedra_id, StoreKatedraRequest $request)
     {
-        dd($request);
+        $katedra = Katedra::findOrFail($katedra_id);
+        $katedraDTO = $request->toDTO();
+
+        $result = $this->katedraService->update($katedra, $katedraDTO);
+        return redirect(route('katedra.index'));
     }
 }

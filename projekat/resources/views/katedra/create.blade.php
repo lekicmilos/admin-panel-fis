@@ -17,7 +17,7 @@
     @endif
 </div>
 
-<form action="{{$method=='post' ? route('katedra.store') : route('katedra.update', ['katedra_id' => $katedra->id])}}" method="{{$method}}">
+<form action="{{$method=='post' ? route('katedra.store') : route('katedra.update', ['katedra_id' => $katedra->id])}}" method="post">
 
     @csrf
     @method($method)

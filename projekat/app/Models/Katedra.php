@@ -6,6 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+enum Pozicija: string
+{
+    case Sef = "Šef katedre";
+    case Zamenik = "Zamenik katedre";
+}
+
 class Katedra extends Model
 {
     use HasFactory;
