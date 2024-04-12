@@ -38,16 +38,15 @@ class KatedraController extends Controller
 
     public function create()
     {
-        // TODO dodati pretragu paginaciju itd
         $zaposleni = Zaposleni::all();
-        return view('katedra.create', ['method' => 'post', 'zaposleni' => $zaposleni, 'katedra'=>null]);
+        return view('katedra.create', ['method' => 'post', 'zaposleni' => $zaposleni, 'katedra' => null]);
     }
 
     public function store(StoreKatedraRequest $request)
     {
         $katedraDTO = $request->toDTO();
 
-        $result = $this->katedraService->store($katedraDTO);
+        $result = $this->katedraService->upsert($katedraDTO);
 
         /*if($result instanceof Validator && $result->fails()){
             $err_msgs = $result->errors();
@@ -67,10 +66,10 @@ class KatedraController extends Controller
 
     public function update(int $katedra_id, StoreKatedraRequest $request)
     {
-        $katedra = Katedra::findOrFail($katedra_id);
-        $katedraDTO = $request->toDTO();
+        // todo dodaj find or fail i prosledi
+        $katedraDTO = $request->toDTO($katedra_id);
 
-        $result = $this->katedraService->update($katedra, $katedraDTO);
+        $result = $this->katedraService->upsert($katedraDTO);
         return redirect(route('katedra.index'));
     }
 }

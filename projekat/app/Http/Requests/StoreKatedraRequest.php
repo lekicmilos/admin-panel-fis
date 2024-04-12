@@ -49,7 +49,7 @@ class StoreKatedraRequest extends FormRequest
         ];
     }
 
-    public function toDTO(): KatedraDTO
+    public function toDTO($katedra_id = null): KatedraDTO
     {
         $sef = new ZaposleniNaKatedriDTO(
             id: $this->sef_id,
@@ -77,7 +77,7 @@ class StoreKatedraRequest extends FormRequest
         }
 
         $katedraDTO = new KatedraDTO(
-            id: null,
+            id: $katedra_id,
             naziv: $this->naziv,
             aktivna: true,
             zaposleni: $zaposleni,
