@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\DTO\KatedraDTO;
 use App\Http\Requests\StoreKatedraRequest;
 use App\Models\Katedra;
+use App\Models\Pozicija;
 use App\Models\Zaposleni;
 use App\Services\KatedraService;
 use Carbon\Carbon;
@@ -29,11 +30,7 @@ class KatedraController extends Controller
     {
         $katedre = Katedra::where('aktivna', 1)->get();
 
-        $katedreDTO = [];
-        foreach ($katedre as $katedra) {
-            $katedreDTO[] = $this->katedraService->toDTO($katedra);
-        }
-        return view('katedra.index', ['katedre' => $katedreDTO]);
+        return view('katedra.index', ['katedre' => $katedre]);
     }
 
     public function create()

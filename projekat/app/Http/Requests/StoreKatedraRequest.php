@@ -51,19 +51,9 @@ class StoreKatedraRequest extends FormRequest
 
     public function toDTO($katedra_id = null): KatedraDTO
     {
-        $sef = new ZaposleniNaKatedriDTO(
-            id: $this->sef_id,
-            ime: null,
-            datum_od: $this->sef_datum_od,
-            datum_do: $this->sef_datum_do
-        );
+        $sef = new ZaposleniNaKatedriDTO($this->sef_id,null,$this->sef_datum_od,$this->sef_datum_do);
 
-        $zamenik = new ZaposleniNaKatedriDTO(
-            id: $this->zamenik_id,
-            ime: null,
-            datum_od: $this->zamenik_datum_od,
-            datum_do: $this->zamenik_datum_do
-        );
+        $zamenik = new ZaposleniNaKatedriDTO($this->zamenik_id,null,$this->zamenik_datum_od,$this->zamenik_datum_do);
 
         $zaposleni = [];
         foreach ($this->zaposleni as $zap_id => $zap)

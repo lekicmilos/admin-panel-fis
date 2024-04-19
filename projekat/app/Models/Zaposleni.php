@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -25,13 +26,18 @@ class Zaposleni extends Model
         "datum_penzije",
     ];
 
+    public function punoIme()
+    {
+        return $this->ime.' '.$this->srednje_slovo.'. '.$this->prezime;
+    }
+
     public function angazovanje(): BelongsToMany
     {
         return $this->belongsToMany(Katedra::class,
             'angazovanje_na_katedri',
             'zaposleni_id',
             'katedra_id')
-            ->withPivot('datum_od', 'datum_do')
+            ->withPivot('id', 'datum_od', 'datum_do')
             ->withTimestamps();
     }
 

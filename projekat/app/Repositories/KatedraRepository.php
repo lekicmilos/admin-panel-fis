@@ -43,11 +43,11 @@ class KatedraRepository
             ];
         }
 
-        // sync ili attach ??
-        $katedra->angazovanje()->sync($zaposleni);*/
+
+        $katedra->angazovanje()->attach($zaposleni);*/
 
         // da li sef i zamenik moze biti ista osoba????
-        $katedra->pozicija()->attach([
+        $katedra->pozicija()->sync([
             $data->sef->id => [
                 'pozicija' => Pozicija::Sef,
                 'datum_od' => $data->sef->datum_od,

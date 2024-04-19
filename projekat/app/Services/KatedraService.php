@@ -100,78 +100,6 @@ class KatedraService
             return $validator;
         }*/
 
-        $zaposleni_sync = [];
-        $zaposleni_attach = [];
-
-        // zatvaranje angazovanja zaposlenih prilikom unosa nove katedra
-        foreach ($katedraDTO->zaposleni as $zap)
-        {
-            // pri izmeni: ako je vec aktivan, izmeniti angazovanje (sync)
-            // ako nije aktivan, dodati angazovanje (attach)
-            $aktivan = false;
-
-            if ($katedraDTO->id)
-            {
-                $aktivan = DB::table('angazovanje_na_katedri')
-                    ->whereRaw('( zaposleni_id = ? AND katedra_id = ? AND ( datum_do > ? OR datum_od < ?) )',
-                        [$zap->id, $katedraDTO->id, $zap->datum_od, $zap->datum_do])->doesntExist();
-
-            }
-
-
-            if ($aktivan)
-                $zaposleni_sync[$zap->id] = [
-                    'datum_od' => $zap->datum_od,
-                    'datum_do' => $zap->datum_do
-                ];
-            else
-                $zaposleni_attach[$zap->id] = [
-                    'datum_od' => $zap->datum_od,
-                    'datum_do' => $zap->datum_do
-                ];
-
-
-
-            $datum_pocetka_novog = Carbon::createFromFormat('Y-m-d', $zap->datum_od);
-            $datum_zavrsetka_starog = $datum_pocetka_novog->addDays(-1);
-
-            // nadji prethodno angazovanje -> zatvoriti datum_do kao pocetak novog - 1
-            DB::table('angazovanje_na_katedri')
-                ->whereRaw('( zaposleni_id = ? AND datum_od < ? AND (datum_do IS NULL OR datum_do > ?) )',
-                    [$zap->id, $zap->datum_od, $zap->datum_od])
-                ->update(['datum_do' => $datum_zavrsetka_starog]);
-
-            /** varijanta brisemo sve */
-
-//            // nadji angazovanja koja pocinju nakon novog angazovanja -> obrisati kompletno
-//            // alternativa: izbaciti gresku ?
-//            DB::table('angazovanje_na_katedri')
-//                ->whereRaw('( zaposleni_id = ? AND datum_od > ? )',
-//                    [$zap->id, $zap->datum_od])
-//                ->delete();
-
-
-            // nadji angazovanja koja pocinju u trajanju novog -> obrisati kompletno
-            // alternativa: izbaciti gresku ??
-            DB::table('angazovanje_na_katedri')
-                ->whereRaw('( zaposleni_id = ? AND datum_od > ? AND (datum_do IS NULL OR datum_do < ? OR ?) )',
-                    [$zap->id, $zap->datum_od, $zap->datum_do, $zap->datum_do === null ? 1 : 0])
-                ->delete();
-
-            // nadji angazovanja koja su pocela pre zavrsetka novog -> pomeriti pocetak starog
-            // alternativa: izbaciti gresku ??
-            if ($zap->datum_do)
-            {
-                $datum_zavrsetka_novog = Carbon::createFromFormat('Y-m-d', $zap->datum_do);
-                $datum_pocetka_starog = $datum_zavrsetka_novog->addDays(1);
-
-                DB::table('angazovanje_na_katedri')
-                    ->whereRaw('( zaposleni_id = ? AND datum_od < ? AND (datum_do IS NULL OR datum_do > ?) )',
-                        [$zap->id, $zap->datum_do, $zap->datum_do])
-                    ->update(['datum_od' => $datum_pocetka_starog]);
-            }
-
-        }
 
         $katedra = Katedra::find($katedraDTO->id);
         if (empty($katedra)) {
@@ -183,8 +111,66 @@ class KatedraService
 
         $katedra->save();
 
-        $katedra->angazovanje()->attach($zaposleni_attach);
-        $katedra->angazovanje()->syncWithoutDetaching($zaposleni_sync);
+        foreach ($katedraDTO->zaposleni as $zap)
+        {
+            // nadji prethodna angazovanja zaposlenog na katedri
+            $prethodna = $katedra->angazovanje()->where('zaposleni_id', $zap->id)->get();
+
+            foreach ($prethodna as $angazovanja) {
+                $pr_id = $angazovanja->pivot->id;
+                $pr_datum_od = $angazovanja->pivot->datum_od;
+                $pr_datum_do = $angazovanja->pivot->datum_do;
+
+                // ako je zaposleni vec angazovan na katedri u tom periodu obrisati to angazovanje
+                // osiguravamo da zaposleni nema poklapajuca angazovanja na istoj katedri
+                if (!(($pr_datum_od < $zap->datum_od && $pr_datum_do < $zap->datum_od) ||
+                    ($zap->datum_do && $pr_datum_od > $zap->datum_do))) {
+                    DB::table('angazovanje_na_katedri')->delete($pr_id);
+                }
+            }
+
+            // dodaj novo angazovanje u tabelu
+            $katedra->angazovanje()->attach($zap->id, ['datum_od' => $zap->datum_od, 'datum_do' => $zap->datum_do]);
+
+
+
+            // nadji angazovanja na ostalim katedrama
+            $zaposleni = Zaposleni::find($zap->id);
+            $ostala = $zaposleni->angazovanje()->whereNot('katedra_id', $katedra->id)->get();
+
+            foreach ($ostala as $angazovanja) {
+                $pr_id = $angazovanja->pivot->id;
+                $pr_datum_od = $angazovanja->pivot->datum_od;
+                $pr_datum_do = $angazovanja->pivot->datum_do;
+
+
+                // ako je angazovanje pocelo pre pocetka novog, zatvori ga pomocu datuma do
+                if ($pr_datum_od < $zap->datum_od /*&& (is_null($pr_datum_do) || $pr_datum_do > $zap->datum_do)*/)
+                {
+                    $datum_pocetka_novog = Carbon::createFromFormat('Y-m-d', $zap->datum_od);
+                    $datum_zavrsetka_starog = $datum_pocetka_novog->subDay();
+                    DB::table('angazovanje_na_katedri')->where('id', $pr_id)->update(['datum_do' => $datum_zavrsetka_starog]);
+                }
+                // ako je angazovanje pocelo pre zavrsetka novog, promeniti pocetak starog angazovanja
+                elseif ($zap->datum_do && $pr_datum_od < $zap->datum_do && (is_null($pr_datum_do) || $pr_datum_do > $zap->datum_do))
+                {
+                    $datum_zavrsetka_novog = Carbon::createFromFormat('Y-m-d', $zap->datum_do);
+                    $datum_pocetka_starog = $datum_zavrsetka_novog->addDay();
+                    DB::table('angazovanje_na_katedri')->where('id', $pr_id)->update(['datum_od' => $datum_pocetka_starog]);
+                }
+                // ako je angazovanje pocelo u trajanju novog, obrisati ga
+                elseif (/*$pr_datum_od >= $zap->datum_od && */((is_null($pr_datum_do) || is_null($zap->datum_do) || $pr_datum_do < $zap->datum_do))) {
+                    DB::table('angazovanje_na_katedri')->delete($pr_id);
+                }
+                // angazovanje se ne poklapa sa novim angazovanjem tako da ne moramo raditi nista
+
+            }
+
+
+        }
+
+        $katedra->dodajPoziciju(Pozicija::Sef, $katedraDTO->sef->id, $katedraDTO->sef->datum_od, $katedraDTO->sef->datum_do);
+        $katedra->dodajPoziciju(Pozicija::Zamenik, $katedraDTO->zamenik->id, $katedraDTO->zamenik->datum_od, $katedraDTO->zamenik->datum_do);
 
         return $katedra->fresh();
         //return $this->katedraRepository->upsert($katedraDTO);

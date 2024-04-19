@@ -15,9 +15,9 @@
     </tr>
     @foreach ($katedre as $katedra)
         <tr>
-            <td>{{$katedra->naziv}}</td>
-            <td>{{$katedra->sef->ime ?? 'Nema'}}</td>
-            <td>{{$katedra->zamenik->ime ?? 'Nema'}}</td>
+            <td>{{$katedra->naziv_katedre}}</td>
+            <td>{{$katedra->sef() ?? 'Nema'}}</td>
+            <td>{{$katedra->zamenik() ?? 'Nema'}}</td>
             <td>
                 <a href="{{route('katedra.edit', ['katedra_id' => $katedra->id])}}">Izmeni</a>
             </td>
