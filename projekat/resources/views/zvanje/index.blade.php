@@ -22,7 +22,7 @@
                 <form method="post" action="{{route('zvanje.destroy', ['zvanje' => $zvanje])}}">
                     @csrf
                     @method('delete')
-                    <input type="submit" value="Obrisi" />
+                    <input type="submit" value="Obriši" />
                 </form>
             </td>
         </tr>

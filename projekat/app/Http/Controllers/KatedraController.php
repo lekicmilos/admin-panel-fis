@@ -63,10 +63,26 @@ class KatedraController extends Controller
 
     public function update(int $katedra_id, StoreKatedraRequest $request)
     {
-        // todo dodaj find or fail i prosledi
         $katedraDTO = $request->toDTO($katedra_id);
 
         $result = $this->katedraService->upsert($katedraDTO);
-        return redirect(route('katedra.index'));
+        return redirect(route('katedra.index'))->with('success', 'Katedra uspešno izmenjena.');
+    }
+
+    public function delete(int $katedra_id)
+    {
+        $katedra = Katedra::findOrFail($katedra_id);
+        $katedra->update(['aktivna' => 0]);
+        return redirect(route('katedra.index'))->with('success', 'Katedra uspešno obrisana.');
+    }
+
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+        $katedre = Katedra::where([
+            ['aktivna', 1],
+            ['naziv_katedre', 'REGEXP', $search]
+        ])->get();
+        return view('katedra.index', ['katedre' => $katedre]);
     }
 }

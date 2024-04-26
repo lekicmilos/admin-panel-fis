@@ -15,18 +15,19 @@ use Illuminate\Support\Facades\Validator;
 
 class KatedraService
 {
-    /**
-     * @var KatedraRepository
-     */
-    protected $katedraRepository;
 
-    /**
-     * @param $katedraRepository
-     */
-    public function __construct(KatedraRepository $katedraRepository)
-    {
-        $this->katedraRepository = $katedraRepository;
-    }
+//    /**
+//     * @var KatedraRepository
+//     */
+//    protected $katedraRepository;
+//
+//    /**
+//     * @param $katedraRepository
+//     */
+//    public function __construct(KatedraRepository $katedraRepository)
+//    {
+//        $this->katedraRepository = $katedraRepository;
+//    }
 
     protected function validator($data)
     {

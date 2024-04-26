@@ -20,3 +20,5 @@ Route::get('/katedra/create', [KatedraController::class, 'create'])->name('kated
 Route::post('/katedra', [KatedraController::class, 'store'])->name('katedra.store');
 Route::get('/katedra/{katedra_id}/edit', [KatedraController::class, 'edit'])->name('katedra.edit');
 Route::put('/katedra/{katedra_id}', [KatedraController::class, 'update'])->name('katedra.update');
+Route::delete('/katedra/{katedra_id}', [KatedraController::class, 'delete'])->name('katedra.destroy');
+Route::get('/katedra/search', [KatedraController::class, 'search'])->name('katedra.search');
