@@ -46,7 +46,7 @@ class KatedraService
     {
         return new ZaposleniNaKatedriDTO(
             $zap->id,
-            $zap->ime.' '.$zap->srednje_slovo.'. '.$zap->prezime,
+            $zap->punoIme(),
             $zap->pivot->datum_od,
             $zap->pivot->datum_do
         );

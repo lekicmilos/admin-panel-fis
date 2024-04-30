@@ -50,7 +50,7 @@ class KatedraController extends Controller
             Log::error($err_msgs);
             return back()->withErrors($err_msgs);
         }*/
-        return redirect(route('katedra.index'));
+        return redirect(route('katedra.index'))->with('success', 'Katedra '.$result->naziv_katedre.' uspešno dodata.');
     }
 
     public function edit(int $katedra_id)
@@ -66,14 +66,14 @@ class KatedraController extends Controller
         $katedraDTO = $request->toDTO($katedra_id);
 
         $result = $this->katedraService->upsert($katedraDTO);
-        return redirect(route('katedra.index'))->with('success', 'Katedra uspešno izmenjena.');
+        return redirect(route('katedra.index'))->with('success', 'Katedra '.$result->naziv_katedre.' uspešno izmenjena.');
     }
 
     public function delete(int $katedra_id)
     {
         $katedra = Katedra::findOrFail($katedra_id);
         $katedra->update(['aktivna' => 0]);
-        return redirect(route('katedra.index'))->with('success', 'Katedra uspešno obrisana.');
+        return redirect(route('katedra.index'))->with('success', 'Katedra '.$katedra->naziv_katedre.' uspešno obrisana.');
     }
 
     public function search(Request $request)

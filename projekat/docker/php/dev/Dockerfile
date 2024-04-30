@@ -13,5 +13,5 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 RUN useradd -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
     chown -R $user:$user /var/www
-WORKDIR /var/www
+WORKDIR /var/www/html
 USER $user
