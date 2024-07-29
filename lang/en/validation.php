@@ -16,7 +16,7 @@ return [
     'accepted' => 'The :attribute field must be accepted.',
     'accepted_if' => 'The :attribute field must be accepted when :other is :value.',
     'active_url' => 'The :attribute field must be a valid URL.',
-    'after' => 'The :attribute field must be a date after :date.',
+    'after' => 'Polje :attribute mora biti datum kasniji od :date.',
     'after_or_equal' => 'The :attribute field must be a date after or equal to :date.',
     'alpha' => 'The :attribute field must only contain letters.',
     'alpha_dash' => 'The :attribute field must only contain letters, numbers, dashes, and underscores.',

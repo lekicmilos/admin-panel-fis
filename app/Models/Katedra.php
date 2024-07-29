@@ -113,27 +113,24 @@ class Katedra extends Model
     public function sef()
     {
         $sef = $this->trenutnaPozicija(Pozicija::Sef);
-        if ($sef)
-            return $sef->punoIme();
-        else
-            return null;
+        return $sef ? $sef->punoIme() : null;
     }
 
     public function zamenik()
     {
         $zamenik = $this->trenutnaPozicija(Pozicija::Zamenik);
-        if ($zamenik)
-            return $zamenik->punoIme();
-        else
-            return null;
+        return $zamenik ? $zamenik->punoIme() : null;
     }
     public function trenutnaPozicija(Pozicija $pozicija)
     {
         $danas = Carbon::now();
-        return  $this->pozicija()
+        return $this->pozicija()
             ->wherePivot('pozicija', $pozicija)
             ->wherePivot('datum_od', '<=', $danas)
-            ->whereRaw('(datum_do IS NULL OR datum_do >= ?)', [$danas])
+            ->where(function ($query) use ($danas) {
+                $query->whereNull('datum_do')
+                    ->orWhere('datum_do', '>=', $danas);
+            })
             ->first();
     }
 }
