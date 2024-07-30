@@ -73,7 +73,7 @@ class KatedraService
         $katedra->aktivna = true;
         $katedra->save();
 
-        // cuvanje ID-ova angazovanja radi poredjenja
+        // cuvanje ID-ova angazovanja pre obrade radi poredjenja
         $postojecaAng = DB::table('angazovanje_na_katedri')
             ->where('katedra_id', $katedra->id)
             ->pluck('id')
@@ -85,7 +85,7 @@ class KatedraService
         foreach ($katedraDTO->zaposleni as $zap)
             $obradjenaAng[] = $this->upsertZaposlenog($katedra, $zap);
 
-        // brisanje angazovanih
+        // brisanje angazovanih koji nisu obradjeni
         $za_brisanje = array_diff($postojecaAng, $obradjenaAng);
         DB::table('angazovanje_na_katedri')->whereIn('id', $za_brisanje)->delete();
 
@@ -137,7 +137,7 @@ class KatedraService
         // dodaj novo angazovanje u tabelu
         if (!$updated && !$existing) {
             $katedra->angazovanje()->attach($zap->id, ['datum_od' => $zap->datum_od, 'datum_do' => $zap->datum_do]);
-            $processed_id = $pr_id;
+            $processed_id = 0;
         }
 
         // nadji angazovanja na ostalim katedrama
