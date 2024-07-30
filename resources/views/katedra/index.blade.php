@@ -1,14 +1,20 @@
-<h1>Katedre</h1>
-
-<form action="{{route('katedra.search')}}" method="get">
-    <input type="text" name="search" placeholder="Pretraži katedre">
-    <button type="submit">Pretraži</button>
-</form>
+@extends('layouts.app')
 
 <div>
-    @if (session()->has('success'))
-        <div> {{session('success')}} </div>
-    @endif
+
+    <h1>Katedre</h1>
+
+    <form action="{{route('katedra.search')}}" method="get">
+        <input type="text" name="search" placeholder="Pretraži katedre">
+        <button type="submit">Pretraži</button>
+    </form>
+
+    <div>
+        @if (session()->has('success'))
+            <div> {{session('success')}} </div>
+        @endif
+    </div>
+
 </div>
 
 @if (count($katedre) > 0)

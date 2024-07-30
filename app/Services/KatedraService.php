@@ -47,7 +47,7 @@ class KatedraService
         $sef = $this->uzmiPoziciju(Pozicija::Sef, $katedra);
         $zamenik = $this->uzmiPoziciju(Pozicija::Zamenik, $katedra);
 
-        $aktivni_zaposleni = $katedra->angazovanje()->get();
+        $aktivni_zaposleni = $katedra->angazovanje()->latest()->get();
 
         $zaposleni = [];
         foreach ($aktivni_zaposleni as $zap)
