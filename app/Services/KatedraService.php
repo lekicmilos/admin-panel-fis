@@ -16,23 +16,8 @@ use Illuminate\Support\Facades\Validator;
 class KatedraService
 {
 
-//    /**
-//     * @var KatedraRepository
-//     */
-//    protected $katedraRepository;
-//
-//    /**
-//     * @param $katedraRepository
-//     */
-//    public function __construct(KatedraRepository $katedraRepository)
-//    {
-//        $this->katedraRepository = $katedraRepository;
-//    }
-
     protected function validator($data)
     {
-        return Validator::make($data, []);
-
         // TODO duplikati zaposlenog
 
         // da li sef i zamenik moze biti ista osoba
@@ -53,16 +38,8 @@ class KatedraService
     }
 
     private function uzmiPoziciju(Pozicija $pozicija, Katedra $katedra) {
-
-        $datum = Carbon::now();
-        $zap = $katedra->pozicija()
-            ->whereRaw('(pozicija = ? and (datum_do IS NULL or (datum_od <= ? and datum_do >= ?)))',
-                [$pozicija, $datum, $datum])->first();
-
-        if ($zap)
-            return $this->toZaposleniNaKatedriDTO($zap);
-        else
-            return null;
+        $zap = $katedra->trenutnaPozicija($pozicija);
+        return $zap ? $this->toZaposleniNaKatedriDTO($zap) : null;
     }
 
     public function toDTO(Katedra $katedra): KatedraDTO
@@ -70,20 +47,19 @@ class KatedraService
         $sef = $this->uzmiPoziciju(Pozicija::Sef, $katedra);
         $zamenik = $this->uzmiPoziciju(Pozicija::Zamenik, $katedra);
 
-        $datum = Carbon::now();
-        $aktivni_zaposleni =$katedra->angazovanje()->get();
+        $aktivni_zaposleni = $katedra->angazovanje()->get();
 
         $zaposleni = [];
         foreach ($aktivni_zaposleni as $zap)
             $zaposleni[] = $this->toZaposleniNaKatedriDTO($zap);
 
         return new KatedraDTO(
-            id: $katedra->id,
-            naziv: $katedra->naziv_katedre,
-            aktivna: $katedra->aktivna,
-            zaposleni: $zaposleni,
-            sef: $sef,
-            zamenik: $zamenik,
+            $katedra->id,
+            $katedra->naziv_katedre,
+            $katedra->aktivna,
+            $zaposleni,
+            $sef,
+            $zamenik,
         );
     }
 
@@ -105,12 +81,15 @@ class KatedraService
 
         $obradjenaAng = [];
 
+        // obrada angazovanih
         foreach ($katedraDTO->zaposleni as $zap)
             $obradjenaAng[] = $this->upsertZaposlenog($katedra, $zap);
 
+        // brisanje angazovanih
         $za_brisanje = array_diff($postojecaAng, $obradjenaAng);
         DB::table('angazovanje_na_katedri')->whereIn('id', $za_brisanje)->delete();
 
+        // obrada pozicija
         $this->upsertPozicija($katedra, Pozicija::Sef, $katedraDTO->sef);
         $this->upsertPozicija($katedra, Pozicija::Zamenik, $katedraDTO->zamenik);
 

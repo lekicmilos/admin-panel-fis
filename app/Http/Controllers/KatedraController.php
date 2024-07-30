@@ -42,15 +42,8 @@ class KatedraController extends Controller
     public function store(StoreKatedraRequest $request)
     {
         $katedraDTO = $request->toDTO();
-
         $result = $this->katedraService->upsert($katedraDTO);
-
-        /*if($result instanceof Validator && $result->fails()){
-            $err_msgs = $result->errors();
-            Log::error($err_msgs);
-            return back()->withErrors($err_msgs);
-        }*/
-        return redirect(route('katedra.index'))->with('success', 'Katedra '.$result->naziv_katedre.' uspešno dodata.');
+        return redirect(route('katedra.index'))->with('success', ''.$result->naziv_katedre.' uspešno dodata.');
     }
 
     public function edit(int $katedra_id)
@@ -64,9 +57,8 @@ class KatedraController extends Controller
     public function update(int $katedra_id, StoreKatedraRequest $request)
     {
         $katedraDTO = $request->toDTO($katedra_id);
-
         $result = $this->katedraService->upsert($katedraDTO);
-        return redirect(route('katedra.index'))->with('success', 'Katedra '.$result->naziv_katedre.' uspešno izmenjena.');
+        return redirect(route('katedra.index'))->with('success', ''.$result->naziv_katedre.' uspešno izmenjena.');
     }
 
     public function delete(int $katedra_id)
