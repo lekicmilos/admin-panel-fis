@@ -47,7 +47,7 @@ class Zaposleni extends Model
             'pozicija_na_katedri',
             'zaposleni_id',
             'katedra_id')
-            ->withPivot('pozicija', 'datum_od', 'datum_do')
+            ->withPivot('id', 'pozicija', 'datum_od', 'datum_do')
             ->withTimestamps();
     }
 

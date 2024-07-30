@@ -28,7 +28,7 @@ class KatedraController extends Controller
 
     public function index()
     {
-        $katedre = Katedra::where('aktivna', 1)->get();
+        $katedre = Katedra::with('pozicija')->where('aktivna', 1)->get();
 
         return view('katedra.index', ['katedre' => $katedre]);
     }
