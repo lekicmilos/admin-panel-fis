@@ -29,7 +29,14 @@ class KatedraTable extends DataTableComponent
         return [
             Column::make("Id", "id")
                 ->sortable(),
-            Column::make("Naziv katedre", "naziv_katedre")
+            Column::make("Naziv", "naziv_katedre")
+                ->sortable()
+                ->searchable(),
+            Column::make("Šef")
+                ->label(fn($row) => $row->sef() ?? 'Nema')
+                ->sortable(),
+            Column::make("Zamenik")
+                ->label(fn($row) => $row->zamenik() ?? 'Nema')
                 ->sortable(),
             ButtonGroupColumn::make('Actions')
                 ->attributes(function($row) {
@@ -38,15 +45,22 @@ class KatedraTable extends DataTableComponent
                     ];
                 })
                 ->buttons([
-
-                    LinkColumn::make('Edit')
-                        ->title(fn($row) => 'Edit ' . $row->name)
+                    LinkColumn::make('Izmeni')
+                        ->title(fn($row) => 'Izmeni')
                         ->location(fn($row) => route('katedra.edit', ['katedra_id' => $row->id]))
                         ->attributes(function($row) {
                             return [
                                 'target' => '_blank',
                                 'class' => 'underline text-blue-500 hover:no-underline',
-
+                            ];
+                        }),
+                    LinkColumn::make('Obriši')
+                        ->title(fn($row) => 'Obriši')
+                        ->location(fn($row) => "route('katedra.destroy', ['katedra_id' => $row->id])")
+                        ->attributes(function($row) {
+                            return [
+                                'class' => 'underline text-blue-500 hover:no-underline',
+                                'wire:confirm' => "Are you sure you want to delete this post?"
                             ];
                         }),
                 ]),

@@ -1,6 +1,6 @@
-<div>
-    <h1 class="text-3xl font-bold">Katedra</h1>
-    <div class="w-6/12 m-8">
+<div class="m-8">
+    <h1 class="text-3xl font-bold py-4">Katedre</h1>
+    <div class="w-8/12">
         <livewire:katedra-table />
     </div>
 </div>
