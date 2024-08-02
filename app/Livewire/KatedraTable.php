@@ -21,7 +21,6 @@ class KatedraTable extends DataTableComponent
     public function builder(): Builder
     {
         return Katedra::with('pozicija')->where('aktivna', 1);
-
     }
 
     public function columns(): array
