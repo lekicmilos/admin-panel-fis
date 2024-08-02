@@ -19,7 +19,7 @@ Route::delete('/zvanje/{zvanje}', [ZvanjeController::class, 'destroy'])->name('z
 
 Route::get('/katedra', KatedraIndex::class)->name('katedra.index');
 //Route::get('/katedra', [KatedraController::class, 'index'])->name('katedra.index');
-Route::get('/katedra/create', [KatedraController::class, 'create'])->name('katedra.create');
+Route::get('/katedra/create', \App\Livewire\KatedraForm::class)->name('katedra.create');
 Route::post('/katedra', [KatedraController::class, 'store'])->name('katedra.store');
 Route::get('/katedra/{katedra_id}/edit', [KatedraController::class, 'edit'])->name('katedra.edit');
 Route::put('/katedra/{katedra_id}', [KatedraController::class, 'update'])->name('katedra.update');

@@ -34,6 +34,7 @@ class KatedraForm extends Component
         'sef.datum_do' => 'nullable|date|after:sef.datum_od'
     ])]
     public $sef = [];
+
     #[Validate([
         'zamenik' => 'required',
         'zamenik.datum_od' => 'required|date',
@@ -42,14 +43,23 @@ class KatedraForm extends Component
     public $zamenik = [];
     public $katedraService;
     public $all_zaposleni = [];
+
+    public $headers;
     public function mount($katedra_id = null)
     {
         $this->all_zaposleni = Zaposleni::all()->map(function ($zap) {
             return [
                 'id' => $zap->id,
-                'ime' => $zap->punoIme(),
+                'name' => $zap->punoIme(),
             ];
         })->toArray();
+
+        $this->headers = [
+            ['key' => 'id', 'label' => '#'],
+            ['key' => 'ime', 'label' => 'ime'],
+            ['key' => 'datum_od', 'label' => 'Datum od'],
+            ['key' => 'datum_do', 'label' => 'Datum do'],
+        ];
 
         $katedraService = new KatedraService();
         if ($katedra_id) {
