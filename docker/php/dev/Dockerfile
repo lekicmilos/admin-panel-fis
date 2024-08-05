@@ -1,6 +1,7 @@
 FROM php:8.3-fpm
 ARG user
 ARG uid
+RUN usermod -u 1000 www-data
 
 RUN apt update && apt install -y git curl zip unzip
 
@@ -12,6 +13,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 RUN useradd -G www-data,root -u $uid -d /home/$user $user
 RUN mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /var/www
+    chown -R $user:$user /var/www/html \
+
 WORKDIR /var/www/html
 USER $user

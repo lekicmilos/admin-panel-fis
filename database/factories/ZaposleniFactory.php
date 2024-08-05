@@ -22,7 +22,7 @@ class ZaposleniFactory extends Factory
         return [
             'ime' => $this->faker->firstName,
             'prezime' => $this->faker->lastName,
-            'srednje_slovo' => $this->faker->randomLetter(),
+            'srednje_slovo' => Str::upper($this->faker->randomLetter()),
             'email' => $this->faker->unique()->safeEmail,
             'pol' => $this->faker->randomElement(['Muski', 'Zenski']),
             'fis_broj' => $this->faker->unique()->randomNumber(5),
