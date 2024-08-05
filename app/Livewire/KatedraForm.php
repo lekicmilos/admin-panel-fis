@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\DTO\KatedraDTO;
+use App\DTO\ZaposleniNaKatedriDTO;
 use App\Models\Katedra;
 use App\Models\Zaposleni;
 use App\Services\KatedraService;
@@ -14,12 +16,11 @@ use Livewire\Component;
 class KatedraForm extends Component
 {
     public $title = '';
-    public $katedra = null;
+
+    public $katedra_id = null;
 
     #[Validate('required|min:3')]
     public $naziv = '';
-
-    //public $selectedZaposleni = null;
 
     #[Validate([
         'zaposleni' => 'required|min:1',
@@ -30,23 +31,26 @@ class KatedraForm extends Component
 
     #[Validate([
         'sef' => 'required',
+        'sef.id' => 'required|exists:zaposleni,id',
         'sef.datum_od' => 'required|date',
         'sef.datum_do' => 'nullable|date|after:sef.datum_od'
     ])]
-    public $sef = [];
+    public $sef = ['id' => null, 'datum_od' => null, 'datum_do' => null];
 
     #[Validate([
         'zamenik' => 'required',
+        'zamenik.id' => 'required|exists:zaposleni,id',
         'zamenik.datum_od' => 'required|date',
         'zamenik.datum_do' => 'nullable|date|after:zamenik.datum_od'
     ])]
-    public $zamenik = [];
-    public $katedraService;
+    public $zamenik = ['id' => null, 'datum_od' => null, 'datum_do' => null];
+    //public $katedraService;
     public $all_zaposleni = [];
 
     public $headers;
     public function mount($katedra_id = null)
     {
+        // load the combo box data
         $this->all_zaposleni = Zaposleni::all()->map(function ($zap) {
             return [
                 'id' => $zap->id,
@@ -54,34 +58,27 @@ class KatedraForm extends Component
             ];
         })->toArray();
 
+        // mini table headers
         $this->headers = [
-            ['key' => 'id', 'label' => '#'],
-            ['key' => 'ime', 'label' => 'ime'],
-            ['key' => 'datum_od', 'label' => 'Datum od'],
-            ['key' => 'datum_do', 'label' => 'Datum do'],
+            ['key' => 'id', 'label' => '#', 'hidden' => 'true'],
+            ['key' => 'ime', 'label' => 'IME', 'class' => 'w-48'],
+            ['key' => 'datum_od', 'label' => 'DATUM OD', 'class' => 'w-32'],
+            ['key' => 'datum_do', 'label' => 'DATUM DO', 'class' => 'w-32'],
         ];
 
-        $katedraService = new KatedraService();
+        // if in edit mode load the fields
         if ($katedra_id) {
            $this->title = 'Izmeni katedru';
-           $katedra = $katedraService->toDTO(Katedra::findOrFail($katedra_id));
-           $naziv = $katedra->naziv;
-           $zaposleni = $katedra->zaposleni;
-           $sef = $katedra->sef;
-           $zamenik = $katedra->zamenik;
+           $katedra = Katedra::with(['angazovanje', 'pozicija'])->findOrFail($katedra_id);
+           $katedraDTO = (new \App\Services\KatedraService)->toDTO($katedra);
+           $this->naziv = $katedraDTO->naziv;
+           $this->zaposleni = array_map(function ($zap) {return (array) $zap;}, $katedraDTO->zaposleni);
+           $this->sef = (array) $katedraDTO->sef;
+           $this->zamenik = (array) $katedraDTO->zamenik;
         } else {
             $this->title = 'Nova katedra';
-            //$katedra =
-
         }
 
-    }
-
-    public function validateZaposleniTable()
-    {
-        // Validate specific fields on blur
-//        $this->validateOnly('zaposleni');
-        $this->validate();
     }
 
     public function addZaposleni($selectedZaposleni) {
@@ -102,17 +99,31 @@ class KatedraForm extends Component
         array_splice($this->zaposleni, $index, 1);
     }
 
+    private function prepareDate($date) {
+        return $date=='' ? null : $date;
+    }
+
     public function save()
     {
-//        $this->validate([
-//            'katedra.naziv' => 'required|string|max:255',
-////            'sef' => 'required|exists:zaposleni,id',
-////            'zamenik' => 'nullable|exists:zaposleni,id',
-//            'zaposleniIds.*.datum_od' => 'required|date',
-//            'zaposleniIds.*.datum_do' => 'nullable|date|after:zaposleniIds.*.datum_od',
-//        ]);
+        $this->validate();
 
-//        $katedraService->upsert()
+        $sef = new ZaposleniNaKatedriDTO($this->sef['id'],null,
+            $this->prepareDate($this->sef['datum_od']),
+            $this->prepareDate($this->sef['datum_do']));
+
+        $zamenik = new ZaposleniNaKatedriDTO($this->zamenik['id'],null,
+            $this->prepareDate($this->zamenik['datum_od']),
+            $this->prepareDate($this->zamenik['datum_do']));
+
+        $zaposleni = [];
+        foreach ($this->zaposleni as $zap)
+            $zaposleni[] = new ZaposleniNaKatedriDTO($zap['id'], null,
+                $this->prepareDate($zap['datum_od']),
+                $this->prepareDate($zap['datum_do']));
+
+        $katedraDTO = new KatedraDTO($this->katedra_id,$this->naziv,true,$zaposleni,$sef,$zamenik);
+
+        (new \App\Services\KatedraService)->upsert($katedraDTO);
 
         return redirect()->route('katedra.index');
     }

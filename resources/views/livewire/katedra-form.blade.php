@@ -1,7 +1,7 @@
 <div class="p-6 space-y-4">
     <h1 class="text-3xl font-bold py-4">{{ $title }}</h1>
 
-    <x-form wire:submit.prevent="save" class="space-y-4">
+    <x-form wire:submit="save" class="space-y-4" no-separator>
         @csrf
 
         <!-- Naziv Input -->
@@ -11,7 +11,6 @@
                     type="text"
                     label="Naziv"
                     wire:model.blur="naziv"
-
                     required
             />
         </div>
@@ -21,9 +20,9 @@
         <div class="flex items-center space-x-4">
             <div class="flex-grow">
                 <div class="flex space-x-2">
-                    <x-select label="Šef" :options="$all_zaposleni" wire:model.blur="sef.id" required></x-select>
-                    <x-input label="Datum od" type="date" wire:model.blur="sef.datum_od" required/>
-                    <x-input label="Datum do" type="date" wire:model.blur="sef.datum_do" />
+                    <x-select label="Šef" :options="$all_zaposleni" wire:model="sef.id" placeholder="--Izaberi šefa--" required></x-select>
+                    <x-input label="Datum od" type="date" wire:model="sef.datum_od" required/>
+                    <x-input label="Datum do" type="date" wire:model="sef.datum_do" />
                 </div>
 {{--                <div class="text-sm text-red-600 mt-1">--}}
 {{--                    @error('sef.datum_od') {{ $message }} @enderror--}}
@@ -36,9 +35,9 @@
         <div class="flex items-center space-x-4">
             <div class="flex-grow">
                 <div class="flex space-x-2">
-                    <x-select label="Zamenik" :options="$all_zaposleni" wire:model.blur="zamenik.id" required></x-select>
-                    <x-input label="Datum od" type="date" wire:model.blur="zamenik.datum_od" required />
-                    <x-input label="Datum do" type="date" wire:model.blur="zamenik.datum_do"/>
+                    <x-select label="Zamenik" :options="$all_zaposleni" wire:model="zamenik.id" placeholder="--Izaberi zamenika--" required></x-select>
+                    <x-input label="Datum od" type="date" wire:model="zamenik.datum_od" required />
+                    <x-input label="Datum do" type="date" wire:model="zamenik.datum_do"/>
                 </div>
 {{--                <div class="text-sm text-red-600 mt-1">--}}
 {{--                    @error('zamenik.datum_od') {{ $message }} @enderror--}}
@@ -47,19 +46,36 @@
             </div>
         </div>
 
-        <div x-data="{ selectedZaposleni: '' }" class="w-96 flex items-center space-x-4">
+        <div x-data="{ selectedZaposleni: '' }" class="w-fit flex items-end space-x-4">
             <div class="flex-grow">
-{{--                <label for="zaposleni-select" class="block text-sm font-medium text-gray-700">Zaposleni</label>--}}
-                <x-select label="Zaposleni" :options="$all_zaposleni" x-model="selectedZaposleni"></x-select>
+                <x-select label="Zaposleni" :options="$all_zaposleni" x-model="selectedZaposleni" placeholder="--Izaberi zaposlenog--"></x-select>
             </div>
-            <button type="button" @click="$wire.addZaposleni(selectedZaposleni)" class="bg-indigo-600 text-white px-4 py-2 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                Dodaj zaposlenog
-            </button>
+            <x-button icon='o-plus' label="Dodaj zaposlenog" @click="$wire.addZaposleni(selectedZaposleni)" class="btn-outline" spinner="addZaposleni"/>
         </div>
 
-
         <!-- Zaposleni Table -->
-        <x-table :headers="$headers" :rows="$zaposleni"></x-table>
+        @if(!empty($zaposleni))
+        <div class="w-fit">
+            <x-table :headers="$headers" :rows="$zaposleni" wire:model="zaposleni">
+                @scope('cell_datum_od', $zap)
+                <x-input type="date" :value="$zap['datum_od']" wire:model="zaposleni.{{ $loop->index }}.datum_od" />
+                @endscope
+
+                @scope('cell_datum_do', $zap)
+                <x-input type="date" :value="$zap['datum_do']" wire:model="zaposleni.{{ $loop->index }}.datum_do" />
+                @endscope
+
+                @scope('actions', $zap)
+                <x-button icon="o-trash" wire:click="removeZaposleni({{ $loop->index }})" spinner class="btn-sm" />
+                @endscope
+            </x-table>
+        </div>
+        @endif
+
+        <x-slot:actions>
+            <x-button label="Sačuvaj" class="btn-primary" type="submit" spinner="save" />
+        </x-slot:actions>
+
 {{--        @if(!empty($zaposleni))--}}
 {{--        <div>--}}
 {{--            <table class=" divide-y divide-gray-200 text-sm">--}}
