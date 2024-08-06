@@ -4,17 +4,19 @@ use App\Http\Controllers\KatedraController;
 use App\Http\Controllers\ZvanjeController;
 use App\Livewire\KatedraForm;
 use App\Livewire\KatedraIndex;
+use App\Livewire\ZvanjeIndex;
 use App\Livewire\KatedraTable;
+use App\Livewire\ZvanjeForm;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/zvanje', [ZvanjeController::class, 'index'])->name('zvanje.index');
-Route::get('/zvanje/create', [ZvanjeController::class, 'create'])->name('zvanje.create');
+Route::get('/zvanje', ZvanjeIndex::class)->name('zvanje.index');
+Route::get('/zvanje/create', ZvanjeForm::class)->name('zvanje.create');
 Route::post('/zvanje', [ZvanjeController::class, 'store'])->name('zvanje.store');
-Route::get('/zvanje/{zvanje}/edit', [ZvanjeController::class, 'edit'])->name('zvanje.edit');
+Route::get('/zvanje/{zvanje_id}/edit', ZvanjeForm::class)->name('zvanje.edit');
 Route::put('/zvanje/{zvanje}', [ZvanjeController::class, 'update'])->name('zvanje.update');
 Route::delete('/zvanje/{zvanje}', [ZvanjeController::class, 'destroy'])->name('zvanje.destroy');
 
