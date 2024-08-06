@@ -12,6 +12,7 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class KatedraForm extends Component
 {
@@ -51,7 +52,7 @@ class KatedraForm extends Component
     public function mount($katedra_id = null)
     {
         // load the combo box data
-        $this->all_zaposleni = Zaposleni::all()->map(function ($zap) {
+        $this->all_zaposleni = Zaposleni::all()->sortBy(['ime', 'sredjne_slovo'])->map(function ($zap) {
             return [
                 'id' => $zap->id,
                 'name' => $zap->punoIme(),

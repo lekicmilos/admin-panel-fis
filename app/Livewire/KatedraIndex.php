@@ -7,19 +7,26 @@ use App\Services\KatedraService;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Title('Pregled katedri')]
 class KatedraIndex extends Component
 {
+    use WithPagination;
 
-    public $katedre = [];
+//    public $katedre = [];
     public $headers;
-    public bool $deleteModal = false;
+
+    private function loadKatedra() {
+        return Katedra::with(['pozicija', 'angazovanje'])
+            ->where('aktivna', 1)
+            ->paginate(10);
+    }
 
     public function mount() {
-        $this->katedre = Katedra::with(['pozicija', 'angazovanje'])->where('aktivna', 1)->get();
         $this->headers = [
-            ['key' => 'naziv_katedre', 'label' =>'Naziv'],
+//            ['key' => 'id', 'label' => '#'],
+            ['key' => 'naziv_katedre', 'label' =>'Naziv', 'class' => 'font-bold'],
             ['key' => 'sef', 'label' =>'Šef'],
             ['key' => 'zamenik', 'label' =>'Zamenik'],
             ['key' => 'broj_zap', 'label' =>'Broj zaposlenih', 'class' => 'hidden lg:table-cell']
@@ -37,12 +44,12 @@ class KatedraIndex extends Component
     public function deleteKatedra($katedra_id) {
         $katedra = Katedra::findOrFail($katedra_id);
         $katedra->update(['aktivna' => 0]);
-        $this->katedre = Katedra::with('pozicija')->where('aktivna', 1)->get();
-        $this->deleteModal = false;
     }
 
     public function render()
     {
-        return view('livewire.katedra-index');
+        return view('livewire.katedra-index', [
+            'katedre' => $this->loadKatedra()
+        ]);
     }
 }
