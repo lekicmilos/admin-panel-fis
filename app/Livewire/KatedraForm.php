@@ -39,7 +39,7 @@ class KatedraForm extends Component
 
     #[Validate([
         'zamenik' => 'required',
-        'zamenik.id' => 'required|exists:zaposleni,id',
+        'zamenik.id' => 'required|exists:zaposleni,id|different:sef.id',
         'zamenik.datum_od' => 'required|date',
         'zamenik.datum_do' => 'nullable|date|after:zamenik.datum_od'
     ])]
@@ -61,9 +61,9 @@ class KatedraForm extends Component
         // mini table headers
         $this->headers = [
             ['key' => 'id', 'label' => '#', 'hidden' => 'true'],
-            ['key' => 'ime', 'label' => 'IME', 'class' => 'w-48'],
-            ['key' => 'datum_od', 'label' => 'DATUM OD', 'class' => 'w-32'],
-            ['key' => 'datum_do', 'label' => 'DATUM DO', 'class' => 'w-32'],
+            ['key' => 'ime', 'label' => 'ime', 'class' => 'w-48'],
+            ['key' => 'datum_od', 'label' => 'datum od', 'class' => 'w-32'],
+            ['key' => 'datum_do', 'label' => 'datum do', 'class' => 'w-32'],
         ];
 
         // if in edit mode load the fields
@@ -73,8 +73,8 @@ class KatedraForm extends Component
            $katedraDTO = (new \App\Services\KatedraService)->toDTO($katedra);
            $this->naziv = $katedraDTO->naziv;
            $this->zaposleni = array_map(function ($zap) {return (array) $zap;}, $katedraDTO->zaposleni);
-           $this->sef = (array) $katedraDTO->sef;
-           $this->zamenik = (array) $katedraDTO->zamenik;
+           if ($katedraDTO->sef) $this->sef = (array) $katedraDTO->sef;
+           if ($katedraDTO->zamenik) $this->zamenik = (array) $katedraDTO->zamenik;
         } else {
             $this->title = 'Nova katedra';
         }
@@ -100,7 +100,7 @@ class KatedraForm extends Component
     }
 
     private function prepareDate($date) {
-        return $date=='' ? null : $date;
+        return empty($date) ? null : $date;
     }
 
     public function save()
@@ -122,6 +122,7 @@ class KatedraForm extends Component
                 $this->prepareDate($zap['datum_do']));
 
         $katedraDTO = new KatedraDTO($this->katedra_id,$this->naziv,true,$zaposleni,$sef,$zamenik);
+
 
         (new \App\Services\KatedraService)->upsert($katedraDTO);
 
