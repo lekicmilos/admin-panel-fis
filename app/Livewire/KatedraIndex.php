@@ -34,7 +34,7 @@ class KatedraIndex extends Component
     public function mount() {
         $this->headers = [
 //            ['key' => 'id', 'label' => '#'],
-            ['key' => 'naziv_katedre', 'label' =>'Naziv', 'class' => 'font-bold'],
+            ['key' => 'naziv_katedre', 'label' =>'Naziv', 'class' => 'font-bold text-lg'],
             ['key' => 'sef', 'label' =>'Šef'],
             ['key' => 'zamenik', 'label' =>'Zamenik'],
             ['key' => 'broj_zap', 'label' =>'Broj zaposlenih', 'class' => 'hidden lg:table-cell']

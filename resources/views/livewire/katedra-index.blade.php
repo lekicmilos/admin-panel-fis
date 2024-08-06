@@ -29,14 +29,26 @@
             with-pagination>
 
             @scope('cell_sef', $katedra)
-                {{ $katedra->sef() ?? 'Nema' }}
+            @php $sef = $katedra->sef(); @endphp
+            <span class="{{ is_null($sef) ? 'text-error' : '' }}">
+                {{ $sef ?? 'Nema' }}
+            </span>
             @endscope
+
             @scope('cell_zamenik', $katedra)
-                {{ $katedra->zamenik() ?? 'Nema '}}
+            @php $zamenik = $katedra->zamenik(); @endphp
+            <span class="{{ is_null($zamenik) ? 'text-error' : '' }}">
+                {{ $zamenik ?? 'Nema' }}
+            </span>
             @endscope
+
             @scope('cell_broj_zap', $katedra)
-                {{ $katedra->brojZaposlenih() ?? 'Nema '}}
+            @php $broj_zap = $katedra->brojZaposlenih(); @endphp
+            <span class="{{ ($broj_zap ?? 0) === 0 ? 'text-error' : '' }}">
+                {{ $broj_zap ?? 'Nema' }}
+            </span>
             @endscope
+
             @scope('actions', $katedra)
             <div>
                 <x-button
