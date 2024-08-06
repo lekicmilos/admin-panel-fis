@@ -1,5 +1,7 @@
-<div class="p-6 space-y-4">
+<div>
     <h1 class="text-3xl font-bold py-4">{{ $title }}</h1>
+
+    <x-hr />
 
     <x-form wire:submit="save" class="space-y-4" no-separator>
 

@@ -47,7 +47,7 @@ class KatedraService
         $sef = $this->uzmiPoziciju(Pozicija::Sef, $katedra);
         $zamenik = $this->uzmiPoziciju(Pozicija::Zamenik, $katedra);
 
-        $aktivni_zaposleni = $katedra->angazovanje()->latest()->get();
+        $aktivni_zaposleni = $katedra->angazovanje()->get()->sortBy(['ime', 'pivot.datum_od']);
 
         $zaposleni = [];
         foreach ($aktivni_zaposleni as $zap)
@@ -62,8 +62,6 @@ class KatedraService
             $zamenik,
         );
     }
-
-
 
     public function upsert(KatedraDTO $katedraDTO)
     {

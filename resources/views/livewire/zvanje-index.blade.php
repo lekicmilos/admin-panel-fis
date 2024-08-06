@@ -1,4 +1,4 @@
-<div class="m-8">
+<div>
     <div class="flex flex-wrap gap-5 justify-between items-center">
         <h1 class="text-3xl font-bold py-4">Zvanja</h1>
         <div>

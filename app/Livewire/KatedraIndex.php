@@ -14,12 +14,20 @@ class KatedraIndex extends Component
 {
     use WithPagination;
 
-//    public $katedre = [];
     public $headers;
+
+    public $searchTerm = '';
+
+    public function updatedSearchTerm() {
+        $this->resetPage();
+    }
 
     private function loadKatedra() {
         return Katedra::with(['pozicija', 'angazovanje'])
             ->where('aktivna', 1)
+            ->when($this->searchTerm, function ($query) {
+                $query->where('naziv_katedre', 'regexp', $this->searchTerm);
+            })
             ->paginate(10);
     }
 
@@ -35,10 +43,6 @@ class KatedraIndex extends Component
 
     public function create() {
         return $this->redirect('/katedra/create', navigate: true);
-    }
-
-    public function edit($katedra_id) {
-        $this->redirectRoute('katedra.edit',  ['katedra_id' => $katedra_id]);
     }
 
     public function deleteKatedra($katedra_id) {
