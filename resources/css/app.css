@@ -1,3 +1,23 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+table {
+    @apply table-zebra rounded-lg overflow-hidden dark:border-neutral-700 shadow-lg dark:shadow-neutral;
+}
+
+thead {
+    @apply dark:text-gray-400 bg-neutral  uppercase ;
+}
+
+.text-black {
+    @apply text-gray-400;
+}
+
+.input {
+    @apply input-bordered
+}
+
+.select-primary {
+    @apply select-bordered text-base
+}

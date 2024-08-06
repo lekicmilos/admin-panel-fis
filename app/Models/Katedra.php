@@ -70,4 +70,15 @@ class Katedra extends Model
             })
             ->first();
     }
+
+    public function brojZaposlenih()
+    {
+        $danas = Carbon::now();
+        return $this->angazovanje()
+            ->wherePivot('datum_od', '<=', $danas)
+            ->where(function ($query) use ($danas) {
+                $query->whereNull('datum_do')
+                    ->orWhere('datum_do', '>=', $danas);
+            })->count();
+    }
 }
