@@ -14,9 +14,12 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Mary\Traits\Toast;
 
 class KatedraForm extends Component
 {
+    use Toast;
+
     public $title = '';
 
     #[Locked]
@@ -71,7 +74,7 @@ class KatedraForm extends Component
         // mini table headers
         $this->headers = [
             ['key' => 'id', 'label' => '#', 'hidden' => 'true'],
-            ['key' => 'ime', 'label' => 'ime', 'class' => 'w-48 text-lg'],
+            ['key' => 'ime', 'label' => 'ime', 'class' => 'min-w-48 text-lg'],
             ['key' => 'datum_od', 'label' => 'datum od', 'class' => 'w-32'],
             ['key' => 'datum_do', 'label' => 'datum do', 'class' => 'w-32'],
         ];
@@ -132,10 +135,10 @@ class KatedraForm extends Component
         return empty($date) ? null : $date;
     }
 
+//    private function hasOverlapping(array $z)
+
     public function save()
     {
-        $this->validate();
-
         $sef = new ZaposleniNaKatedriDTO($this->sef['id'],null,
             $this->prepareDate($this->sef['datum_od']),
             $this->prepareDate($this->sef['datum_do']));
@@ -145,16 +148,29 @@ class KatedraForm extends Component
             $this->prepareDate($this->zamenik['datum_do']));
 
         $zaposleni = [];
-        foreach ($this->zaposleni as $zap)
+        foreach ($this->zaposleni as $zap) {
             $zaposleni[] = new ZaposleniNaKatedriDTO($zap['id'], null,
                 $this->prepareDate($zap['datum_od']),
                 $this->prepareDate($zap['datum_do']));
+        }
+
+        // add additional validation it to the existing validator
+        $this->withValidator(function ($validator) use ($zaposleni) {
+            $validator->after(function ($validator) use ($zaposleni) {
+                if($error_index = KatedraService::validateDuplicate($zaposleni))
+                    $validator->errors()->add('zaposleni.'.$error_index.'.datum_od', 'Zaposleni je već dodat u tom periodu');
+            });
+        });
+
+        $this->validate();
 
         $katedraDTO = new KatedraDTO($this->katedra_id,$this->naziv,true,$zaposleni,$sef,$zamenik);
-
         (new KatedraService)->upsert($katedraDTO);
 
-        return redirect()->route('katedra.index');
+        $this->success(
+            'Katedra '.$this->naziv.' uspešno '.($this->katedra_id ? 'sačuvana' : 'ažurirana').'!',
+            redirectTo: '/katedra'
+        );
     }
 
     public function render()

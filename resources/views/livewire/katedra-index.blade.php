@@ -1,4 +1,5 @@
 <div x-data="{ deleteModal: false, deleteId: null, deleteNaziv: null}" >
+    <x-toast />
     <div class="flex flex-wrap gap-5 justify-between items-center" :class="{'blur-sm': deleteModal}">
         <h1 class="text-3xl font-bold py-4">Katedre</h1>
 

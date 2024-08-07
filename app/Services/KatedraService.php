@@ -65,6 +65,8 @@ class KatedraService
 
     public function upsert(KatedraDTO $katedraDTO)
     {
+
+
         $katedra = Katedra::find($katedraDTO->id) ?? new Katedra();
 
         $katedra->naziv_katedre = $katedraDTO->naziv;
@@ -243,7 +245,31 @@ class KatedraService
         }
     }
 
-    private function isOverlapping($startDate1, $endDate1, $startDate2, $endDate2): bool
+    // for an array of ZaposleniNaKatedraDTO
+    // it returns the index of the first zaposleni that was added twice with the overlapping dates
+    public static function validateDuplicate(array $zaposleniNaKatedriDTOs): null | int
+    {
+        $datesById = [];
+        foreach ($zaposleniNaKatedriDTOs as $index => $zap) {
+            $id = $zap->id;
+            if (!isset($datesById[$id])) {
+                $datesById[$id] = [];
+            }
+
+            foreach ($datesById[$id] as $dates) {
+                if (self::isOverlapping($zap->datum_od, $zap->datum_do, $dates['datum_od'], $dates['datum_do']))
+                    return $index;
+            }
+
+            $datesById[$id][] = [
+                'datum_od' => $zap->datum_od,
+                'datum_do' => $zap->datum_do,
+            ];
+        }
+        return null;
+    }
+
+    private static function isOverlapping($startDate1, $endDate1, $startDate2, $endDate2): bool
     {
         $endDate1 = $endDate1 ?? PHP_INT_MAX;
         $endDate2 = $endDate2 ?? PHP_INT_MAX;

@@ -8,10 +8,12 @@ use Illuminate\Support\Str;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Mary\Traits\Toast;
 
 #[Title('Pregled katedri')]
 class KatedraIndex extends Component
 {
+    use Toast;
     use WithPagination;
 
     public $headers;
@@ -48,6 +50,7 @@ class KatedraIndex extends Component
     public function deleteKatedra($katedra_id) {
         $katedra = Katedra::findOrFail($katedra_id);
         $katedra->update(['aktivna' => 0]);
+        $this->success('Katedra '.$katedra->naziv_katedre.' uspešno obirsana.');
     }
 
     public function render()
