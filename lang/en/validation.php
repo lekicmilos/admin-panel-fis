@@ -41,7 +41,7 @@ return [
     'decimal' => 'The :attribute field must have :decimal decimal places.',
     'declined' => 'The :attribute field must be declined.',
     'declined_if' => 'The :attribute field must be declined when :other is :value.',
-    'different' => 'The :attribute field and :other must be different.',
+    'different' => 'Polje :attribute mora biti drugačije od :other.',
     'digits' => 'The :attribute field must be :digits digits.',
     'digits_between' => 'The :attribute field must be between :min and :max digits.',
     'dimensions' => 'The :attribute field has invalid image dimensions.',

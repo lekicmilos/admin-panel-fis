@@ -13,7 +13,7 @@
                 x-show="$wire.searchTerm !== ''"
             />
             </div>
-            <x-button label="Nova katedra" icon="o-plus" wire:click="create" class="btn-primary" />
+            <x-button label="Nova katedra" responsive icon="o-plus" link="/katedra/create" class="btn-primary" />
         </div>
     </div>
 

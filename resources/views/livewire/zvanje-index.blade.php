@@ -2,7 +2,7 @@
     <div class="flex flex-wrap gap-5 justify-between items-center">
         <h1 class="text-3xl font-bold py-4">Zvanja</h1>
         <div>
-            <x-button label="Novo zvanje" icon="o-plus" wire:click="create" class="btn-primary" />
+            <x-button label="Novo zvanje" responsive icon="o-plus" link="/zvanje/create" class="btn-primary" />
         </div>
     </div>
 

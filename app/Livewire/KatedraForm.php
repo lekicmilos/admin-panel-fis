@@ -45,10 +45,24 @@ class KatedraForm extends Component
         'zamenik.datum_do' => 'nullable|date|after:zamenik.datum_od'
     ])]
     public $zamenik = ['id' => null, 'datum_od' => null, 'datum_do' => null];
-    //public $katedraService;
+
     public $all_zaposleni = [];
 
     public $headers;
+
+    private function mapDTOtoArray(?ZaposleniNaKatedriDTO $dto)
+    {
+        return $dto ? [
+            'id' => strval($dto->id),
+            'datum_od' => $dto->datum_od,
+            'datum_do' => $dto->datum_do
+        ] : [
+            'id' => null,
+            'datum_od' => null,
+            'datum_do' => null
+        ];
+    }
+
     public function mount($katedra_id = null)
     {
         // load the combo box data
@@ -62,7 +76,7 @@ class KatedraForm extends Component
         // mini table headers
         $this->headers = [
             ['key' => 'id', 'label' => '#', 'hidden' => 'true'],
-            ['key' => 'ime', 'label' => 'ime', 'class' => 'w-48'],
+            ['key' => 'ime', 'label' => 'ime', 'class' => 'w-48 text-lg'],
             ['key' => 'datum_od', 'label' => 'datum od', 'class' => 'w-32'],
             ['key' => 'datum_do', 'label' => 'datum do', 'class' => 'w-32'],
         ];
@@ -74,8 +88,8 @@ class KatedraForm extends Component
            $katedraDTO = (new \App\Services\KatedraService)->toDTO($katedra);
            $this->naziv = $katedraDTO->naziv;
            $this->zaposleni = array_map(function ($zap) {return (array) $zap;}, $katedraDTO->zaposleni);
-           if ($katedraDTO->sef) $this->sef = (array) $katedraDTO->sef;
-           if ($katedraDTO->zamenik) $this->zamenik = (array) $katedraDTO->zamenik;
+           $this->sef = $this->mapDTOtoArray($katedraDTO->sef);
+           $this->zamenik = $this->mapDTOtoArray($katedraDTO->zamenik);
         } else {
             $this->title = 'Nova katedra';
         }
