@@ -54,13 +54,10 @@ class KatedraForm extends Component
     {
         return $dto ? [
             'id' => strval($dto->id),
+            'ime' => $dto->ime,
             'datum_od' => $dto->datum_od,
             'datum_do' => $dto->datum_do
-        ] : [
-            'id' => null,
-            'datum_od' => null,
-            'datum_do' => null
-        ];
+        ] : null;
     }
 
     public function mount($katedra_id = null)
@@ -85,9 +82,9 @@ class KatedraForm extends Component
         if ($katedra_id) {
            $this->title = 'Izmeni katedru';
            $katedra = Katedra::with(['angazovanje', 'pozicija'])->findOrFail($katedra_id);
-           $katedraDTO = (new \App\Services\KatedraService)->toDTO($katedra);
+           $katedraDTO = (new KatedraService)->toDTO($katedra);
            $this->naziv = $katedraDTO->naziv;
-           $this->zaposleni = array_map(function ($zap) {return (array) $zap;}, $katedraDTO->zaposleni);
+           $this->zaposleni = array_map([$this, 'mapDTOtoArray'], $katedraDTO->zaposleni);
            $this->sef = $this->mapDTOtoArray($katedraDTO->sef);
            $this->zamenik = $this->mapDTOtoArray($katedraDTO->zamenik);
         } else {
@@ -108,9 +105,7 @@ class KatedraForm extends Component
         }
     }
 
-    public function removeZaposleni($index)
-    {
-        // Remove the item from the array
+    public function removeZaposleni($index) {
         array_splice($this->zaposleni, $index, 1);
     }
 
@@ -138,8 +133,7 @@ class KatedraForm extends Component
 
         $katedraDTO = new KatedraDTO($this->katedra_id,$this->naziv,true,$zaposleni,$sef,$zamenik);
 
-
-        (new \App\Services\KatedraService)->upsert($katedraDTO);
+        (new KatedraService)->upsert($katedraDTO);
 
         return redirect()->route('katedra.index');
     }
