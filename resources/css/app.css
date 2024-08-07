@@ -2,12 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-table {
-    @apply table-zebra rounded-lg overflow-hidden dark:border-neutral-700 shadow-lg dark:shadow-neutral;
+.table {
+    @apply  table-zebra rounded-lg overflow-hidden border-accent shadow-md dark:shadow-neutral;
 }
 
+
 thead {
-    @apply dark:text-gray-400 bg-neutral  uppercase ;
+    @apply bg-base-300 uppercase ;
 }
 
 .text-black {

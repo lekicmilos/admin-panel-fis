@@ -41,8 +41,11 @@
                 <x-menu-item title="Zvanje" link="/zvanje" />
                 <x-menu-item title="Zaposleni" link="/zaposleni" />
                 <x-menu-item title="Katedre" link="/katedra" />
+                <x-theme-toggle class="btn"/>
 
             </x-menu>
+{{--             Theme toggle --}}
+            <x-theme-toggle class="hidden" />
         </x-slot:sidebar>
 
         {{-- The `$slot` goes here --}}

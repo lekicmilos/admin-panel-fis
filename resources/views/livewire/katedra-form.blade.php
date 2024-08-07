@@ -41,23 +41,23 @@
                 placeholder="--Izaberi zaposlenog--"
                 error-field="zaposleni-select"
             />
-            <x-button icon='o-plus' label="Dodaj zaposlenog" @click="$wire.addZaposleni(selectedZaposleni)" class="btn-outline" spinner="addZaposleni"/>
+            <x-button icon='o-plus' label="Dodaj zaposlenog" @click="$wire.addZaposleni(selectedZaposleni)" class="btn-accent text-bg-content" spinner="addZaposleni"/>
         </div>
 
         <!-- Zaposleni Table -->
         @if(!empty($zaposleni))
-            <div class="relative w-max min-w-[40rem] shadow-lg dark:shadow-neutral" x-data="{ showAll: false }">
+            <div class="table relative w-max min-w-[40rem] m-2" x-data="{ showAll: false }">
 
                 <!-- Container for checkbox and label -->
                 @if($katedra_id)
                 <div class="absolute top-0.5 right-1 flex items-center p-2 z-10">
-                    <label class="italic text-sm text-gray-300 dark:text-gray-400">
+                    <label class="italic text-sm text-gray-400">
                         Prikaži sve
                     </label>
                     <x-checkbox
                         x-model="showAll"
                         @click="showAll = !showAll; $wire.applyFilter(showAll);"
-                        class="ml-2"
+                        class="ml-2 checkbox"
                     />
                 </div>
                 @endif

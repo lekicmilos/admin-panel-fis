@@ -55,7 +55,7 @@
                 <x-button
                     icon="o-trash"
                     @click="deleteModal = true; deleteId = {{ $katedra->id }}; deleteNaziv = '{{ $katedra->naziv_katedre }}'"
-                    class="btn-sm bg-neutral" />
+                    class="btn-sm btn-ghost" />
             </div>
             @endscope
 
