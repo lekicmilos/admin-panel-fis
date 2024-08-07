@@ -22,6 +22,10 @@ thead {
     @apply select-bordered text-base
 }
 
+.inactive-zaposleni {
+    @apply italic text-yellow-700 opacity-50
+}
+
 /* Active page highlight */
 .mary-table-pagination span[aria-current="page"] > span {
     @apply bg-primary text-base-100

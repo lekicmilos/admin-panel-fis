@@ -8,6 +8,7 @@ use App\Models\Katedra;
 use App\Models\Zaposleni;
 use App\Services\KatedraService;
 use Carbon\Carbon;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
@@ -18,6 +19,7 @@ class KatedraForm extends Component
 {
     public $title = '';
 
+    #[Locked]
     public $katedra_id = null;
 
     #[Validate('required|min:3')]
@@ -29,6 +31,7 @@ class KatedraForm extends Component
         'zaposleni.*.datum_do' => 'nullable|date|after:zaposleni.*.datum_od'
     ])]
     public $zaposleni = [];
+    public $zaposleni_rows = [];
 
     #[Validate([
         'sef' => 'required',
@@ -48,20 +51,30 @@ class KatedraForm extends Component
 
     public $all_zaposleni = [];
 
-    public $headers;
+    public array $headers;
 
-    private function mapDTOtoArray(?ZaposleniNaKatedriDTO $dto)
+    private function mapDTOtoArray(?ZaposleniNaKatedriDTO $zap)
     {
-        return $dto ? [
-            'id' => strval($dto->id),
-            'ime' => $dto->ime,
-            'datum_od' => $dto->datum_od,
-            'datum_do' => $dto->datum_do
-        ] : null;
+        $danas = Carbon::now();
+
+        return [
+            'id' => $zap ? strval($zap->id) : '',
+            'ime' => $zap ? $zap->ime : '',
+            'datum_od' => $zap ? $zap->datum_od : '',
+            'datum_do' => $zap ? $zap->datum_do : '',
+            'aktivan' => $zap && $zap->datum_od <= $danas && (is_null($zap->datum_do) || $zap->datum_do >= $danas),
+        ];
     }
 
     public function mount($katedra_id = null)
     {
+        // mini table headers
+        $this->headers = [
+            ['key' => 'id', 'label' => '#', 'hidden' => 'true'],
+            ['key' => 'ime', 'label' => 'ime', 'class' => 'w-48 text-lg'],
+            ['key' => 'datum_od', 'label' => 'datum od', 'class' => 'w-32'],
+            ['key' => 'datum_do', 'label' => 'datum do', 'class' => 'w-32'],
+        ];
         // load the combo box data
         $this->all_zaposleni = Zaposleni::all()->sortBy(['ime', 'sredjne_slovo'])->map(function ($zap) {
             return [
@@ -70,43 +83,49 @@ class KatedraForm extends Component
             ];
         })->toArray();
 
-        // mini table headers
-        $this->headers = [
-            ['key' => 'id', 'label' => '#', 'hidden' => 'true'],
-            ['key' => 'ime', 'label' => 'ime', 'class' => 'w-48 text-lg'],
-            ['key' => 'datum_od', 'label' => 'datum od', 'class' => 'w-32'],
-            ['key' => 'datum_do', 'label' => 'datum do', 'class' => 'w-32'],
-        ];
-
         // if in edit mode load the fields
         if ($katedra_id) {
            $this->title = 'Izmeni katedru';
            $katedra = Katedra::with(['angazovanje', 'pozicija'])->findOrFail($katedra_id);
            $katedraDTO = (new KatedraService)->toDTO($katedra);
            $this->naziv = $katedraDTO->naziv;
+
            $this->zaposleni = array_map([$this, 'mapDTOtoArray'], $katedraDTO->zaposleni);
+           usort($this->zaposleni, fn($a, $b) => $b['aktivan'] <=> $a['aktivan']);
+           $this->applyFilter(false);
+
            $this->sef = $this->mapDTOtoArray($katedraDTO->sef);
            $this->zamenik = $this->mapDTOtoArray($katedraDTO->zamenik);
         } else {
             $this->title = 'Nova katedra';
         }
+    }
 
+    public function applyFilter($show_all) {
+        $this->zaposleni_rows = array_filter($this->zaposleni,
+            !$show_all ? fn($zap) => $zap['aktivan'] : null);
     }
 
     public function addZaposleni($selectedZaposleni) {
-        $zap = Zaposleni::find($selectedZaposleni);
-        if ($zap) {
-            $this->zaposleni[] = [
+        if (!empty($selectedZaposleni) && $zap = Zaposleni::find($selectedZaposleni)) {
+            $new_zap = [
                 'id' => $selectedZaposleni,
                 'ime' => $zap->punoIme(),
                 'datum_od' => Carbon::now()->format('Y-m-d'),
                 'datum_do' => null,
+                'aktivan' => true,
             ];
+
+            array_unshift($this->zaposleni, $new_zap);
+            array_unshift($this->zaposleni_rows, $new_zap);
+        } else {
+            $this->addError('zaposleni-select', 'Nije izabran ni jedan zaposleni');
         }
     }
 
     public function removeZaposleni($index) {
         array_splice($this->zaposleni, $index, 1);
+        array_splice($this->zaposleni_rows, $index, 1);
     }
 
     private function prepareDate($date) {
@@ -140,6 +159,12 @@ class KatedraForm extends Component
 
     public function render()
     {
-        return view('livewire.katedra-form');
+        $inactive_zaposleni_decoration = [
+            'inactive-zaposleni' => fn($zap) => !$zap['aktivan'],
+        ];
+
+        return view('livewire.katedra-form')->with([
+            'row_decoration' => $inactive_zaposleni_decoration,
+        ]);
     }
 }
