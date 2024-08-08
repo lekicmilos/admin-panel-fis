@@ -131,6 +131,8 @@ class KatedraForm extends Component
         // show inactive emp if there are errors
         $this->applyFilter(true);
 
+        $this->validate();
+
         // convert properties to DTO
         $sef = new ZaposleniNaKatedriDTO($this->sef['id'],null,
             $this->prepareDate($this->sef['datum_od']),
