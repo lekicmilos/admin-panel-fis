@@ -8,7 +8,7 @@
 
     <hr class="my-5" />
 
-    <div class="table-lg shadow-lg dark:shadow-neutral">
+    <div class="table-lg shadow-lg dark:shadow-neutral max-w-[34rem]">
         <x-table :headers="$headers" :rows="$zvanja" link="zvanje/{id}/edit">
 
             @scope('actions', $zvanje)

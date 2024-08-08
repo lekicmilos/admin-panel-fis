@@ -52,8 +52,6 @@ class KatedraForm extends Component
     ])]
     public $zamenik = ['id' => null, 'datum_od' => null, 'datum_do' => null];
 
-    public $all_zaposleni = [];
-
     public array $headers;
 
     private function mapDTOtoArray(?ZaposleniNaKatedriDTO $zap)
@@ -78,13 +76,6 @@ class KatedraForm extends Component
             ['key' => 'datum_od', 'label' => 'datum od', 'class' => 'w-32'],
             ['key' => 'datum_do', 'label' => 'datum do', 'class' => 'w-32'],
         ];
-        // load the combo box data
-        $this->all_zaposleni = Zaposleni::all()->sortBy(['ime', 'sredjne_slovo'])->map(function ($zap) {
-            return [
-                'id' => $zap->id,
-                'name' => $zap->punoIme(),
-            ];
-        })->toArray();
 
         // if in edit mode load the fields
         if ($katedra_id) {
@@ -135,10 +126,12 @@ class KatedraForm extends Component
         return empty($date) ? null : $date;
     }
 
-//    private function hasOverlapping(array $z)
-
     public function save()
     {
+        // show inactive emp if there are errors
+        $this->applyFilter(true);
+
+        // convert properties to DTO
         $sef = new ZaposleniNaKatedriDTO($this->sef['id'],null,
             $this->prepareDate($this->sef['datum_od']),
             $this->prepareDate($this->sef['datum_do']));
@@ -154,7 +147,7 @@ class KatedraForm extends Component
                 $this->prepareDate($zap['datum_do']));
         }
 
-        // add additional validation it to the existing validator
+        // add additional validation to the existing validator
         $this->withValidator(function ($validator) use ($zaposleni) {
             $validator->after(function ($validator) use ($zaposleni) {
                 if($error_index = KatedraService::validateDuplicate($zaposleni))
@@ -168,19 +161,28 @@ class KatedraForm extends Component
         (new KatedraService)->upsert($katedraDTO);
 
         $this->success(
-            'Katedra '.$this->naziv.' uspešno '.($this->katedra_id ? 'sačuvana' : 'ažurirana').'!',
+            ''.$this->naziv.' uspešno '.($this->katedra_id ? 'sačuvana' : 'ažurirana').'!',
             redirectTo: '/katedra'
         );
     }
 
     public function render()
     {
+        // load the combo box data
+        $all_zaposleni = Zaposleni::all()->sortBy(['ime', 'sredjne_slovo'])->map(function ($zap) {
+            return [
+                'id' => $zap->id,
+                'name' => $zap->punoIme(),
+            ];
+        })->toArray();
+
         $inactive_zaposleni_decoration = [
             'inactive-zaposleni' => fn($zap) => !$zap['aktivan'],
         ];
 
         return view('livewire.katedra-form')->with([
             'row_decoration' => $inactive_zaposleni_decoration,
+            'all_zaposleni' => $all_zaposleni
         ]);
     }
 }
