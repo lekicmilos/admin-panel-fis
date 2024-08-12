@@ -44,8 +44,11 @@ class KatedraService
 
     public function toDTO(Katedra $katedra): KatedraDTO
     {
-        $sef = $this->uzmiPoziciju(Pozicija::Sef, $katedra);
-        $zamenik = $this->uzmiPoziciju(Pozicija::Zamenik, $katedra);
+        $sef = $katedra->sef->first();
+        $zamenik = $katedra->zamenik->first();
+
+        $sef = $sef ? $this->toZaposleniNaKatedriDTO($sef) : null;
+        $zamenik = $zamenik ? $this->toZaposleniNaKatedriDTO($zamenik) : null;
 
         $aktivni_zaposleni = $katedra->angazovanje()->get()->sortBy(['ime', 'pivot.datum_od']);
 
@@ -65,12 +68,10 @@ class KatedraService
 
     public function upsert(KatedraDTO $katedraDTO)
     {
-
-
-        $katedra = Katedra::find($katedraDTO->id) ?? new Katedra();
+        $katedra = Katedra::with(['angazovanje', 'pozicija'])->find($katedraDTO->id) ?? new Katedra();
 
         $katedra->naziv_katedre = $katedraDTO->naziv;
-        $katedra->aktivna = true;
+        $katedra->aktivna = 1;
         $katedra->save();
 
         // cuvanje ID-ova angazovanja pre obrade radi poredjenja

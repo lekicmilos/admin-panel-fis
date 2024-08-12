@@ -59,10 +59,10 @@ class KatedraForm extends Component
         $danas = Carbon::now();
 
         return [
-            'id' => $zap ? strval($zap->id) : '',
-            'ime' => $zap ? $zap->ime : '',
-            'datum_od' => $zap ? $zap->datum_od : '',
-            'datum_do' => $zap ? $zap->datum_do : '',
+            'id' => (string)$zap?->id,
+            'ime' => $zap?->ime,
+            'datum_od' => $zap?->datum_od,
+            'datum_do' => $zap?->datum_do,
             'aktivan' => $zap && $zap->datum_od <= $danas && (is_null($zap->datum_do) || $zap->datum_do >= $danas),
         ];
     }
@@ -80,7 +80,7 @@ class KatedraForm extends Component
         // if in edit mode load the fields
         if ($katedra_id) {
            $this->title = 'Izmeni katedru';
-           $katedra = Katedra::with(['angazovanje', 'pozicija'])->findOrFail($katedra_id);
+           $katedra = Katedra::findOrFail($katedra_id);
            $katedraDTO = (new KatedraService)->toDTO($katedra);
            $this->naziv = $katedraDTO->naziv;
 
@@ -171,12 +171,15 @@ class KatedraForm extends Component
     public function render()
     {
         // load the combo box data
-        $all_zaposleni = Zaposleni::all()->sortBy(['ime', 'sredjne_slovo'])->map(function ($zap) {
-            return [
-                'id' => $zap->id,
-                'name' => $zap->punoIme(),
-            ];
-        })->toArray();
+        $all_zaposleni = Zaposleni::all(['id', 'ime', 'prezime', 'srednje_slovo'])
+            ->sortBy(['ime', 'sredjne_slovo'])
+            ->map(function ($zap) {
+                return [
+                    'id' => $zap->id,
+                    'name' => $zap->punoIme(),
+                ];
+            })
+            ->toArray();
 
         $inactive_zaposleni_decoration = [
             'inactive-zaposleni' => fn($zap) => !$zap['aktivan'],

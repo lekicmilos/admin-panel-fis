@@ -13,7 +13,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             flatpickr.setDefaults({
-                altFormat: "d.m.Y",          // Display format for users
+                altFormat: "d.m.Y",
+                dateFormat: "Y-m-d",
             });
         });
     </script>
