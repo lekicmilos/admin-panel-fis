@@ -20,7 +20,7 @@
 
     <x-hr class="my-5" />
 
-    <div class="min-w-fit table-lg" :class="{'blur-sm': deleteModal}">
+    <div class="max-w-fit mx-auto table-lg" :class="{'blur-sm': deleteModal}">
         <x-table
             :headers="$headers"
             :rows="$katedre"
@@ -30,21 +30,21 @@
             with-pagination>
 
             @scope('cell_sef', $katedra)
-            @php $sef = $katedra->sef(); @endphp
+            @php $sef = $katedra->sef->first(); @endphp
             <span class="{{ is_null($sef) ? 'text-error' : '' }}">
-                {{ $sef ?? 'Nema' }}
+                {{ $sef?->punoIme() ?? 'Nema' }}
             </span>
             @endscope
 
             @scope('cell_zamenik', $katedra)
-            @php $zamenik = $katedra->zamenik(); @endphp
+            @php $zamenik = $katedra->zamenik->first(); @endphp
             <span class="{{ is_null($zamenik) ? 'text-error' : '' }}">
-                {{ $zamenik ?? 'Nema' }}
+                {{ $zamenik?->punoIme() ?? 'Nema' }}
             </span>
             @endscope
 
             @scope('cell_broj_zap', $katedra)
-            @php $broj_zap = $katedra->brojZaposlenih(); @endphp
+            @php $broj_zap = $katedra->aktivniZaposleni->count(); @endphp
             <span class="{{ ($broj_zap ?? 0) === 0 ? 'text-error' : '' }}">
                 {{ $broj_zap ?? 'Nema' }}
             </span>

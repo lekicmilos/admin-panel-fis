@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -49,6 +50,12 @@ class Zaposleni extends Model
             'katedra_id')
             ->withPivot('id', 'pozicija', 'datum_od', 'datum_do')
             ->withTimestamps();
+    }
+
+    public function scopeActiveDate($query)
+    {
+        $danas = Carbon::now();
+        return $query->whereRaw('datum_od <= CURDATE() AND (datum_do IS NULL OR datum_do >= CURDATE())');
     }
 
     public function zvanja(): BelongsToMany

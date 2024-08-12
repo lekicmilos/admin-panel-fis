@@ -25,7 +25,7 @@ class KatedraIndex extends Component
     }
 
     private function loadKatedra() {
-        return Katedra::with(['pozicija', 'angazovanje'])
+        return Katedra::with(['sef', 'zamenik', 'aktivniZaposleni'])
             ->where('aktivna', 1)
             ->when($this->searchTerm, function ($query) {
                 $query->where('naziv_katedre', 'regexp', $this->searchTerm);
@@ -35,7 +35,6 @@ class KatedraIndex extends Component
 
     public function mount() {
         $this->headers = [
-//            ['key' => 'id', 'label' => '#'],
             ['key' => 'naziv_katedre', 'label' =>'Naziv', 'class' => 'font-bold text-lg'],
             ['key' => 'sef', 'label' =>'Šef'],
             ['key' => 'zamenik', 'label' =>'Zamenik'],

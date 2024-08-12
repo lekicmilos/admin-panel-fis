@@ -47,38 +47,28 @@ class Katedra extends Model
             ->withTimestamps();
     }
 
-    public function sef()
-    {
-        $sef = $this->trenutnaPozicija(Pozicija::Sef);
-        return $sef ? $sef->punoIme() : null;
-    }
-
-    public function zamenik()
-    {
-        $zamenik = $this->trenutnaPozicija(Pozicija::Zamenik);
-        return $zamenik ? $zamenik->punoIme() : null;
-    }
-    public function trenutnaPozicija(Pozicija $pozicija)
+    public function scopeActiveDate($query)
     {
         $danas = Carbon::now();
+        return $query->whereRaw('datum_od <= CURDATE() AND (datum_do IS NULL OR datum_do >= CURDATE())');
+    }
+
+    public function sef(): BelongsToMany
+    {
         return $this->pozicija()
-            ->wherePivot('pozicija', $pozicija)
-            ->wherePivot('datum_od', '<=', $danas)
-            ->where(function ($query) use ($danas) {
-                $query->whereNull('datum_do')
-                    ->orWhere('datum_do', '>=', $danas);
-            })
-            ->first();
+            ->wherePivot('pozicija', Pozicija::Sef)
+            ->activeDate();
     }
 
-    public function brojZaposlenih()
+    public function zamenik(): BelongsToMany
     {
-        $danas = Carbon::now();
-        return $this->angazovanje()
-            ->wherePivot('datum_od', '<=', $danas)
-            ->where(function ($query) use ($danas) {
-                $query->whereNull('datum_do')
-                    ->orWhere('datum_do', '>=', $danas);
-            })->count();
+        return $this->pozicija()
+            ->wherePivot('pozicija', Pozicija::Zamenik)
+            ->activeDate();
+    }
+
+    public function aktivniZaposleni(): BelongsToMany
+    {
+        return $this->angazovanje()->activeDate();
     }
 }
