@@ -66,4 +66,12 @@ class Zaposleni extends Model
             'zaposleni_id')
             ->withPivot('datum_od', 'datum_do');
     }
-}
+
+    public function katedra() : BelongsToMany {
+        return $this->angazovanje()->activeDate();
+    }
+
+    public function zvanje() : BelongsToMany {
+        return $this->zvanja()->activeDate();
+    }
+ }

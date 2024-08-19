@@ -12,7 +12,7 @@ readonly class ZaposleniDTO
         public string $srednje_slovo,
         public string $email,
         public string $pol,
-        public int $broj,
+        public int $fis_broj,
         public bool $u_penziji,
         public string $datum_penzije,
         public ?KatedraZaposlenogDTO $katedra,
