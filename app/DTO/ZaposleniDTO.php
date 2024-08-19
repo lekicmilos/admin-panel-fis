@@ -14,7 +14,7 @@ readonly class ZaposleniDTO
         public string $pol,
         public int $fis_broj,
         public bool $u_penziji,
-        public string $datum_penzije,
+        public ?string $datum_penzije,
         public ?KatedraZaposlenogDTO $katedra,
         public ?ZvanjeZaposlenogDTO $zvanje,
     )

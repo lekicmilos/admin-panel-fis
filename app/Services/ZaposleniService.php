@@ -6,11 +6,12 @@ use App\DTO\KatedraZaposlenogDTO;
 use App\DTO\ZaposleniDTO;
 use App\DTO\ZaposleniNaKatedriDTO;
 use App\DTO\ZvanjeZaposlenogDTO;
+use App\Models\Katedra;
 use App\Models\Zaposleni;
 
 class ZaposleniService
 {
-    public function toDTO(Zaposleni $zaposleni)
+    public static function toDTO(Zaposleni $zaposleni)
     {
         $katedra = $zaposleni->katedra->first();
         $zvanje = $zaposleni->zvanje->first();
@@ -28,19 +29,19 @@ class ZaposleniService
             $katedra ? new KatedraZaposlenogDTO(
                 $katedra->id,
                 $katedra->naziv_katedre,
-                $katedra->datum_od,
-                $katedra->datum_do,
+                $katedra->pivot->datum_od,
+                $katedra->pivot->datum_do,
             ) : null,
             $zvanje ? new ZvanjeZaposlenogDTO(
                 $zvanje->id,
                 $zvanje->naziv_zvanja,
-                $zvanje->datum_od,
-                $zvanje->datum_do,
+                $zvanje->pivot->datum_od,
+                $zvanje->pivot->datum_do,
             ) : null,
         );
     }
 
-    public function upsert(ZaposleniDTO $zaposleniDTO)
+    public static function upsert(ZaposleniDTO $zaposleniDTO)
     {
         $zaposleni = Zaposleni::find($zaposleniDTO->id) ?? new Zaposleni();
 
@@ -53,6 +54,7 @@ class ZaposleniService
         $zaposleni->fis_broj = $zaposleniDTO->fis_broj;
         $zaposleni->u_penziji = $zaposleniDTO->u_penziji;
         $zaposleni->datum_penzije = $zaposleniDTO->datum_penzije;
+        $zaposleni->active = 1;
 
         $zaposleni->save();
 
@@ -63,5 +65,8 @@ class ZaposleniService
         }
 
         // TODO uraditi isto za zvanje
+        // fulltext index https://laravel.com/docs/11.x/queries#full-text-where-clauses
+        // Rule 'email' => ['required', 'email', \Illuminate\Validation\Rule::unique('users')->ignore($this->user()->id)]
+
     }
 }
