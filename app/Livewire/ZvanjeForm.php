@@ -36,7 +36,7 @@ class ZvanjeForm extends Component
 
     public function rules() {
         return [
-            'naziv' => "required|min:3|unique:zvanje,naziv_zvanja,$this->naziv"
+            'naziv' => "required|min:3|unique:zvanje,naziv_zvanja,$this->zvanje_id"
         ];
     }
 

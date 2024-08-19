@@ -13,6 +13,6 @@ class ZaposleniSeeder extends Seeder
      */
     public function run(): void
     {
-        Zaposleni::factory()->count(100)->create();
+        Zaposleni::factory()->count(500)->create();
     }
 }

@@ -14,15 +14,15 @@
         <!-- Sef Selection -->
         <div class="flex items-center space-x-4 flex-grow">
             <x-select label="Šef" :options="$all_zaposleni" wire:model="sef.id" placeholder="--Izaberi šefa--" required></x-select>
-            <x-datepicker label="Datum od" wire:model="sef.datum_od" required icon="o-calendar" class="w-48" />
-            <x-datepicker label="Datum do" wire:model="sef.datum_do" icon="o-calendar" class="w-48" />
+            <x-datepicker label="Datum od" wire:model="sef.datum_od" required icon="o-calendar" class="w-40" />
+            <x-datepicker label="Datum do" wire:model="sef.datum_do" icon="o-calendar" class="w-40" />
         </div>
 
         <!-- Zamenik Selection -->
         <div class="flex items-center space-x-4 flex-grow">
             <x-select label="Zamenik" :options="$all_zaposleni" wire:model="zamenik.id" placeholder="--Izaberi zamenika--" required></x-select>
-            <x-datepicker label="Datum od" wire:model="zamenik.datum_od" required icon="o-calendar" class="w-48" />
-            <x-datepicker label="Datum do" wire:model="zamenik.datum_do" icon="o-calendar" class="w-48" />
+            <x-datepicker label="Datum od" wire:model="zamenik.datum_od" required icon="o-calendar" class="w-40" />
+            <x-datepicker label="Datum do" wire:model="zamenik.datum_do" icon="o-calendar" class="w-40" />
         </div>
 
         <!-- Dodaj zaposleni button -->
@@ -40,10 +40,9 @@
         <!-- Zaposleni Table -->
         @if(!empty($zaposleni))
             <div class="table relative w-max min-w-[40rem] m-2" x-data="{ showAll: false }">
-
                 <!-- Container for checkbox and label -->
                 @if($katedra_id)
-                    <div class="absolute top-0.5 right-1 flex items-center p-2 z-10">
+                    <div class="absolute right-1 flex items-center p-2 z-10">
                         <label class="italic text-sm text-gray-400">
                             Prikaži sve
                         </label>
@@ -55,13 +54,19 @@
                     </div>
                 @endif
 
-                <x-table :headers="$headers" :row_decoration="$row_decoration" :rows="$zaposleni_rows" class="table-sm">
+                <x-table
+                    :headers="$headers"
+                    :row_decoration="$row_decoration"
+                    :rows="$zaposleni_rows"
+{{--                    link="../../zaposleni/{id}/edit"--}}
+                    class="table-xs"
+                >
                     @scope('cell_datum_od', $zap)
-                    <x-datepicker wire:model="zaposleni.{{ $loop->index }}.datum_od" icon="o-calendar" class="w-48" />
+                    <x-datepicker wire:model="zaposleni.{{ $loop->index }}.datum_od" icon="o-calendar" class="w-40" />
                     @endscope
 
                     @scope('cell_datum_do', $zap)
-                    <x-datepicker wire:model="zaposleni.{{ $loop->index }}.datum_do" icon="o-calendar" class="w-48" />
+                    <x-datepicker wire:model="zaposleni.{{ $loop->index }}.datum_do" icon="o-calendar" class="w-40" />
                     @endscope
 
                     @scope('actions', $zap)
