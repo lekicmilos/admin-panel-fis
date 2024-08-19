@@ -60,7 +60,7 @@ class ZaposleniService
 
         if ($zaposleniDTO->katedra) {
             $katedra = Katedra::find($zaposleniDTO->katedra->id);
-            $zap = new ZaposleniNaKatedriDTO($zaposleniDTO->id, null, $zaposleniDTO->katedra->datum_od, $zaposleniDTO->katedra->datum_do);
+            $zap = new ZaposleniNaKatedriDTO($zaposleni->id, null, $zaposleniDTO->katedra->datum_od, $zaposleniDTO->katedra->datum_do);
             (new KatedraService())->upsertZaposlenog($katedra, $zap);
         }
 

@@ -1,12 +1,12 @@
 <div>
     <h1 class="text-3xl font-bold py-4">{{ $title }}</h1>
 
-    <x-hr />
+    <x-hr/>
 
-    <x-form wire:submit="save" class="space-y-4" x-data="{ showPenzija: $wire.u_penziji }" no-separator>
+    <x-form wire:submit="save" x-data="{ showPenzija: $wire.u_penziji }" no-separator>
 
         <!-- Ime, Srednje Slovo, and Prezime Inputs in the Same Row -->
-        <div class="flex items-center space-x-4">
+        <div class="flex items-end space-x-4">
             <!-- Ime Input -->
             <div class="w-96">
                 <x-input
@@ -87,51 +87,55 @@
 
         <!-- Katedra Selection -->
         <div class="flex items-center space-x-4 flex-grow">
-            <x-select
-                label="Katedra"
-                :options="$katedra_options"
-                wire:model="katedra.id"
-                placeholder="--Izaberi katedru--"
-            />
+            <div class="w-full max-w-xs">
+                <x-select
+                    label="Katedra"
+                    :options="$katedra_options"
+                    wire:model="katedra.id"
+                    placeholder="--Izaberi katedru--"
+                />
+            </div>
             <x-datepicker
                 label="Datum od"
                 wire:model="katedra.datum_od"
                 icon="o-calendar"
-                class="w-48"
+                class="w-40"
             />
             <x-datepicker
                 label="Datum do"
                 wire:model="katedra.datum_do"
                 icon="o-calendar"
-                class="w-48"
+                class="w-40"
             />
         </div>
 
         <!-- Zvanje Selection -->
         <div class="flex items-center space-x-4 flex-grow">
-            <x-select
-                label="Zvanje"
-                :options="$zvanje_options"
-                wire:model="zvanje.id"
-                placeholder="--Izaberi zvanje--"
-            />
+            <div class="w-full max-w-xs">
+                <x-select
+                    label="Zvanje"
+                    :options="$zvanje_options"
+                    wire:model="zvanje.id"
+                    placeholder="--Izaberi zvanje--"
+                />
+            </div>
             <x-datepicker
                 label="Datum od"
                 wire:model="zvanje.datum_od"
                 icon="o-calendar"
-                class="w-48"
+                class="w-40"
             />
             <x-datepicker
                 label="Datum do"
                 wire:model="zvanje.datum_do"
                 icon="o-calendar"
-                class="w-48"
+                class="w-40"
             />
         </div>
 
-        <!-- Save Button -->
         <x-slot:actions>
-            <x-button label="Sačuvaj" class="btn-primary" type="submit" spinner="save" />
+            <x-button label="Odustani" link='/zaposleni' class="btn-outline"/>
+            <x-button label="Sačuvaj" class="btn-primary" type="submit" spinner="save"/>
         </x-slot:actions>
     </x-form>
 </div>

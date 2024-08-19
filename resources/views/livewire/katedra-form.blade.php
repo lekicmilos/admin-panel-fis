@@ -77,6 +77,7 @@
         @endif
 
         <x-slot:actions>
+            <x-button label="Odustani" link='/katedra' class="btn-outline" />
             <x-button label="Sačuvaj" class="btn-primary" type="submit" spinner="save" />
         </x-slot:actions>
 

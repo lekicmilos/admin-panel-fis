@@ -134,7 +134,7 @@ return [
     'regex' => 'The :attribute field format is invalid.',
     'required' => 'Polje :attribute mora biti uneto.',
     'required_array_keys' => 'The :attribute field must contain entries for: :values.',
-    'required_if' => 'The :attribute field is required when :other is :value.',
+    'required_if' => 'Polje :attribute mora biti uneto kada je :other :value.',
     'required_if_accepted' => 'The :attribute field is required when :other is accepted.',
     'required_unless' => 'The :attribute field is required unless :other is in :values.',
     'required_with' => 'The :attribute field is required when :values is present.',

@@ -44,7 +44,7 @@ class Zaposleni extends Model
 
     public function pozicija(): BelongsToMany
     {
-        return $this->belongsToMany(Zaposleni::class,
+        return $this->belongsToMany(Katedra::class,
             'pozicija_na_katedri',
             'zaposleni_id',
             'katedra_id')
@@ -54,13 +54,12 @@ class Zaposleni extends Model
 
     public function scopeActiveDate($query)
     {
-        $danas = Carbon::now();
         return $query->whereRaw('datum_od <= CURDATE() AND (datum_do IS NULL OR datum_do >= CURDATE())');
     }
 
     public function zvanja(): BelongsToMany
     {
-        return $this->belongsToMany(Zaposleni::class,
+        return $this->belongsToMany(Zvanje::class,
             'izbor_u_zvanje',
             'zvanje_id',
             'zaposleni_id')

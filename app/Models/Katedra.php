@@ -49,7 +49,6 @@ class Katedra extends Model
 
     public function scopeActiveDate($query)
     {
-        $danas = Carbon::now();
         return $query->whereRaw('datum_od <= CURDATE() AND (datum_do IS NULL OR datum_do >= CURDATE())');
     }
 

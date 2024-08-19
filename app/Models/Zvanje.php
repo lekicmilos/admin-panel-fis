@@ -18,6 +18,11 @@ class Zvanje extends Model
         'nivo'
     ];
 
+    public function scopeActiveDate($query)
+    {
+        return $query->whereRaw('datum_od <= CURDATE() AND (datum_do IS NULL OR datum_do >= CURDATE())');
+    }
+
     public function zaposleni() : BelongsToMany
     {
         return $this->belongsToMany(Zaposleni::class,

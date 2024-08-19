@@ -25,7 +25,8 @@ class KatedraIndex extends Component
     }
 
     private function loadKatedra() {
-        return Katedra::with(['sef', 'zamenik', 'aktivniZaposleni'])
+        return Katedra::with(['sef:id,ime,prezime,srednje_slovo', 'zamenik:id,ime,prezime,srednje_slovo'])
+            ->withCount('aktivniZaposleni')
             ->where('aktivna', 1)
             ->when($this->searchTerm, function ($query) {
                 $query->where('naziv_katedre', 'regexp', $this->searchTerm);
