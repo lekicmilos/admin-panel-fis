@@ -37,7 +37,6 @@ class KatedraForm extends Component
     public $zaposleni_rows = [];
 
     #[Validate([
-        'sef' => 'required',
         'sef.id' => 'required|exists:zaposleni,id',
         'sef.datum_od' => 'required|date',
         'sef.datum_do' => 'nullable|date|after:sef.datum_od'
@@ -45,7 +44,6 @@ class KatedraForm extends Component
     public $sef = ['id' => null, 'datum_od' => null, 'datum_do' => null];
 
     #[Validate([
-        'zamenik' => 'required',
         'zamenik.id' => 'required|exists:zaposleni,id|different:sef.id',
         'zamenik.datum_od' => 'required|date',
         'zamenik.datum_do' => 'nullable|date|after:zamenik.datum_od'
@@ -123,7 +121,7 @@ class KatedraForm extends Component
     }
 
     private function prepareDate($date) {
-        return empty($date) ? null : $date;
+        return empty($date) ? null : Carbon::parse($date)->format('Y-m-d');
     }
 
     public function save()

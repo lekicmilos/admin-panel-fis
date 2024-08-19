@@ -14,7 +14,6 @@ class ZvanjeForm extends Component
 
     public $zvanje_id = null;
 
-    #[Validate('required|min:3')]
     public $naziv = '';
 
     #[Validate('required|numeric')]
@@ -33,6 +32,12 @@ class ZvanjeForm extends Component
             $this->title = 'Novo zvanje';
         }
 
+    }
+
+    public function rules() {
+        return [
+            'naziv' => "required|min:3|unique:zvanje,naziv_zvanja,$this->naziv"
+        ];
     }
 
     public function save()
