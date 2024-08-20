@@ -23,12 +23,13 @@ class Zvanje extends Model
         return $query->whereRaw('datum_od <= CURDATE() AND (datum_do IS NULL OR datum_do >= CURDATE())');
     }
 
-    public function zaposleni() : BelongsToMany
+    public function zaposleni(): BelongsToMany
     {
         return $this->belongsToMany(Zaposleni::class,
-        'izbor_u_zvanje',
-        'zvanje_id',
-        'zaposleni_id')
-            ->withPivot('datum_od', 'datum_do');
+            'izbor_u_zvanje',
+            'zvanje_id',
+            'zaposleni_id')
+            ->withPivot('id', 'datum_od', 'datum_do')
+            ->withTimestamps();
     }
 }

@@ -61,9 +61,10 @@ class Zaposleni extends Model
     {
         return $this->belongsToMany(Zvanje::class,
             'izbor_u_zvanje',
-            'zvanje_id',
-            'zaposleni_id')
-            ->withPivot('datum_od', 'datum_do');
+            'zaposleni_id',
+            'zvanje_id')
+            ->withPivot('id', 'datum_od', 'datum_do')
+            ->withTimestamps();
     }
 
     public function katedra() : BelongsToMany {

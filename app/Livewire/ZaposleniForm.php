@@ -9,6 +9,7 @@ use App\Models\Katedra;
 use App\Models\Zaposleni;
 use App\Models\Zvanje;
 use App\Services\ZaposleniService;
+use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
@@ -101,7 +102,7 @@ class ZaposleniForm extends Component
     }
 
     private function prepareDate($date) {
-        return empty($date) ? null : $date;
+        return empty($date) ? null : Carbon::parse($date)->format('Y-m-d');
     }
 
     public function save()

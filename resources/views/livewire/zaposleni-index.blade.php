@@ -28,7 +28,7 @@
         with-pagination
     >
         @scope('cell_ime', $zap)
-        {{ $zap?->punoIme() ?? 'Nema' }}
+        {{ $zap->punoIme() ?? 'Nema' }}
         @endscope
 
         @scope('cell_katedra', $zap)
@@ -38,7 +38,7 @@
         @endscope
 
         @scope('cell_zvanje', $zap)
-        <div x-data="{ zvanje: `{{$zap->katedra->first()?->naziv_zvanja ?? 'Nema' }}`}">
+        <div x-data="{ zvanje: `{{$zap->zvanje->first()?->naziv_zvanja ?? 'Nema' }}`}">
             <span :class="{ 'text-red-500' : zvanje === 'Nema' }" x-text="zvanje"></span>
         </div>
         @endscope

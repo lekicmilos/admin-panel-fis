@@ -15,18 +15,6 @@ use Illuminate\Support\Facades\Validator;
 
 class KatedraService
 {
-
-    protected function validator($data)
-    {
-        // TODO duplikati zaposlenog
-
-        // da li sef i zamenik moze biti ista osoba
-        // sta se desava kada pri update obrisemo zaposlenog
-        // sta se desava pri poklapanju datuma (da li menjamo pocetak buduceg?)
-        // kako da znamo da li smo promenili nekom datume ili smo uneli duplikat
-
-    }
-
     private function toZaposleniNaKatedriDTO(Zaposleni $zap) : ZaposleniNaKatedriDTO
     {
         return new ZaposleniNaKatedriDTO(
@@ -35,11 +23,6 @@ class KatedraService
             $zap->pivot->datum_od,
             $zap->pivot->datum_do
         );
-    }
-
-    private function uzmiPoziciju(Pozicija $pozicija, Katedra $katedra) {
-        $zap = $katedra->trenutnaPozicija($pozicija);
-        return $zap ? $this->toZaposleniNaKatedriDTO($zap) : null;
     }
 
     public function toDTO(Katedra $katedra): KatedraDTO
@@ -117,9 +100,10 @@ class KatedraService
                 break;
             }
 
-            // ako je zaposleni vec angazovan na katedri u tom periodu obrisati to angazovanje
-            // osiguravamo da zaposleni nema poklapajuca angazovanja na istoj katedri
-            if ($this->isOverlapping($pr_datum_od, $pr_datum_do, $zap->datum_od, $zap->datum_do)) {
+            // ako postoji preklapanje, izmeniti datume angazovanja
+            // ako postoji vise preklapanja, obrisati ostla angazovanja
+            // ovo osigurava da jedan zaposleni ne moze biti angazovan vise puta na istoj katedri u isto vreme
+            if (DateService::isOverlapping($pr_datum_od, $pr_datum_do, $zap->datum_od, $zap->datum_do)) {
                 if (!$updated) {
                     DB::table($table_name)->where('id', $pr_id)
                         ->update([
@@ -146,7 +130,7 @@ class KatedraService
         $angazovanja_na_ostalim_katedrama = $zaposleni->angazovanje()->whereNot('katedra_id', $katedra->id)->get();
 
         foreach ($angazovanja_na_ostalim_katedrama as $prethodna) {
-            $this->obradiPreklapanje($prethodna, $table_name, $zap->datum_od, $zap->datum_do);
+            DateService::obradiPreklapanje($prethodna, $table_name, $zap->datum_od, $zap->datum_do);
         }
 
         return $processed_id;
@@ -173,7 +157,7 @@ class KatedraService
             }
 
             // azurirati poziciju na katedri za datog zaposlenog, ostala poklapanja obrisati
-            if ($this->isOverlapping($pr_datum_od, $pr_datum_do, $zap->datum_od, $zap->datum_do)) {
+            if (DateService::isOverlapping($pr_datum_od, $pr_datum_do, $zap->datum_od, $zap->datum_do)) {
                 if (!$updated) {
                     DB::table($table_name)->where('id', $pr_id)
                         ->update([
@@ -197,7 +181,7 @@ class KatedraService
         // nadji ko je drzao poziciju na toj katedri i azuiriraj datume
         $prethodne_pozicije_na_katedri = $katedra->pozicija()->whereNot('zaposleni_id', $zap->id)->wherePivot('pozicija', $pozicija)->get();
         foreach ($prethodne_pozicije_na_katedri as $prethodna) {
-            $this->obradiPreklapanje($prethodna, $table_name, $zap->datum_od, $zap->datum_do);
+            DateService::obradiPreklapanje($prethodna, $table_name, $zap->datum_od, $zap->datum_do);
         }
 
         // nadji pozicije na ostalim katedrama
@@ -205,44 +189,7 @@ class KatedraService
         $zaposleni = Zaposleni::find($zap->id);
         $pozicije_na_ostalim_katedrama = $zaposleni->pozicija()->whereNot('katedra_id', $katedra->id)->wherePivot('pozicija', $pozicija)->get();
         foreach ($pozicije_na_ostalim_katedrama as $prethodna) {
-            $this->obradiPreklapanje($prethodna, $table_name, $zap->datum_od, $zap->datum_do);
-        }
-    }
-
-    // Funkcija koja prima prethodno angazovanje/poziciju zaposlenog na drugoj katedri,
-    // proverava da li postoji poklapanja i to resava tako sto menja datume/brise prethodno angazovanje
-    // npr. ako je zaposleni radio na katedri1, a sada radi na katedri2, angazovanje na katedri1 se zatvara sa datumom do
-    private function obradiPreklapanje($prethodno, $table_name, $novo_od, $novo_do): void
-    {
-        $pr_id = $prethodno->pivot->id;
-        $pr_datum_od = $prethodno->pivot->datum_od;
-        $pr_datum_do = $prethodno->pivot->datum_do;
-
-        if ($this->isOverlapping($pr_datum_od, $pr_datum_do, $novo_od, $novo_do)) {
-            // ako je angazovanje pocelo pre pocetka novog, zatvori ga pomocu datuma do
-            if ($pr_datum_od < $novo_od)
-            {
-                $datum_zavrsetka_starog = Carbon::createFromFormat('Y-m-d', $novo_od)->subDay();
-                DB::table($table_name)->where('id', $pr_id)
-                    ->update([
-                        'datum_do' => $datum_zavrsetka_starog,
-                        'updated_at' => Carbon::now(),
-                    ]);
-            }
-            // ako je angazovanje pocelo pre zavrsetka novog, promeniti pocetak starog angazovanja
-            elseif ($novo_do && $pr_datum_od < $novo_do && (is_null($pr_datum_do) || $pr_datum_do > $novo_do))
-            {
-                $datum_pocetka_starog = Carbon::createFromFormat('Y-m-d', $novo_do)->addDay();
-                DB::table($table_name)->where('id', $pr_id)
-                    ->update([
-                        'datum_od' => $datum_pocetka_starog,
-                        'updated_at' => Carbon::now(),
-                    ]);
-            }
-            // ako je angazovanje pocelo u trajanju novog ili u slucaju kompletnog preklapanja, obrisati ga
-            else {
-                DB::table($table_name)->delete($pr_id);
-            }
+            DateService::obradiPreklapanje($prethodna, $table_name, $zap->datum_od, $zap->datum_do);
         }
     }
 
@@ -258,7 +205,7 @@ class KatedraService
             }
 
             foreach ($datesById[$id] as $dates) {
-                if (self::isOverlapping($zap->datum_od, $zap->datum_do, $dates['datum_od'], $dates['datum_do']))
+                if (DateService::isOverlapping($zap->datum_od, $zap->datum_do, $dates['datum_od'], $dates['datum_do']))
                     return $index;
             }
 
@@ -269,13 +216,4 @@ class KatedraService
         }
         return null;
     }
-
-    private static function isOverlapping($startDate1, $endDate1, $startDate2, $endDate2): bool
-    {
-        $endDate1 = $endDate1 ?? PHP_INT_MAX;
-        $endDate2 = $endDate2 ?? PHP_INT_MAX;
-        // Check if the periods overlap
-        return $startDate1 <= $endDate2 && $endDate1 >= $startDate2;
-    }
-
 }

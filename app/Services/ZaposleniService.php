@@ -8,6 +8,8 @@ use App\DTO\ZaposleniNaKatedriDTO;
 use App\DTO\ZvanjeZaposlenogDTO;
 use App\Models\Katedra;
 use App\Models\Zaposleni;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class ZaposleniService
 {
@@ -64,9 +66,59 @@ class ZaposleniService
             (new KatedraService())->upsertZaposlenog($katedra, $zap);
         }
 
-        // TODO uraditi isto za zvanje
-        // fulltext index https://laravel.com/docs/11.x/queries#full-text-where-clauses
-        // Rule 'email' => ['required', 'email', \Illuminate\Validation\Rule::unique('users')->ignore($this->user()->id)]
+        if ($zaposleniDTO->zvanje) {
+            self::upsertZvanje($zaposleni, $zaposleniDTO->zvanje);
+        }
+    }
 
+    public static function upsertZvanje(Zaposleni $zaposleni, ZvanjeZaposlenogDTO $zvanjeDTO) {
+        $table_name = 'izbor_u_zvanje';
+        // nadji prethodne izbore istog zvanja zaposlenog
+        $prethodna = $zaposleni->zvanja()->where('zvanje_id', $zvanjeDTO->id)->get();
+
+        $updated = false;
+        $exists = false;
+        foreach ($prethodna as $zvanje) {
+            $pr_id = $zvanje->pivot->id;
+            $pr_datum_od = $zvanje->pivot->datum_od;
+            $pr_datum_do = $zvanje->pivot->datum_do;
+
+            // ako postoji isto zvanje u istom periodu, ne menjati
+            if ($pr_datum_od == $zvanjeDTO->datum_od && $pr_datum_do == $zvanjeDTO->datum_do) {
+                $exists = true;
+                break;
+            }
+
+            // ako postoji preklapanje tog istog zvanja, izmeniti ga
+            // ako postoji vise istih, obrisati
+            // zaposleni ne moze imati vise puta isto zvanje u isto vreme
+            if (DateService::isOverlapping($pr_datum_od, $pr_datum_do, $zvanjeDTO->datum_od, $zvanjeDTO->datum_do)) {
+                if (!$updated) {
+                    DB::table($table_name)->where('id', $pr_id)
+                        ->update([
+                            'datum_od' => $zvanjeDTO->datum_od,
+                            'datum_do' => $zvanjeDTO->datum_do,
+                            'updated_at' => Carbon::now(),
+                        ]);
+                    $updated = true;
+                } else {
+                    DB::table($table_name)->delete($pr_id);
+                }
+            }
+        }
+
+        // ukoliko je novo zvanje, uneti ga
+        if (!$updated && !$exists) {
+            $zaposleni->zvanja()->attach($zvanjeDTO->id, [
+                'datum_od' => $zvanjeDTO->datum_od,
+                'datum_do' => $zvanjeDTO->datum_do
+            ]);
+        }
+
+        // nadji ostale izbore u zvanja zaposlenog i obradi preklapanja ukoliko postoje
+        $ostala_zvanja = $zaposleni->zvanja()->whereNot('zvanje_id', $zvanjeDTO->id)->get();
+        foreach ($ostala_zvanja as $prethodno) {
+            DateService::obradiPreklapanje($prethodno, $table_name, $zvanjeDTO->datum_od, $zvanjeDTO->datum_od);
+        }
     }
 }
