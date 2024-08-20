@@ -27,6 +27,19 @@ thead {
     @apply italic text-yellow-700 opacity-50
 }
 
+.group:hover .group-hover\:opacity-100 {
+    opacity: 1;
+}
+.group .group-hover\:opacity-100 {
+    opacity: 0;
+}
+.group .group-hover\:opacity-100 {
+    transition: opacity 0.3s;
+}
+.group .pointer-events-auto {
+    pointer-events: auto;
+}
+
 /* Active page highlight */
 .mary-table-pagination span[aria-current="page"] > span {
     @apply bg-primary text-base-100

@@ -58,15 +58,46 @@
                     :headers="$headers"
                     :row_decoration="$row_decoration"
                     :rows="$zaposleni_rows"
-{{--                    link="../../zaposleni/{id}/edit"--}}
                     class="table-xs"
                 >
                     @scope('cell_datum_od', $zap)
-                    <x-datepicker wire:model="zaposleni.{{ $loop->index }}.datum_od" icon="o-calendar" class="w-40" />
+                    <div class="relative w-40 h-12 group flex items-center justify-center">
+                        <!-- Display the date as text -->
+                        <span
+                            x-text="new Date($wire.zaposleni[{{ $loop->index }}].datum_od).toLocaleDateString('ro-RO')"
+                            class="cursor-pointer text-base">
+                        </span>
+
+                        <!-- Datepicker, initially hidden and displayed on hover -->
+                        <div class="absolute inset-0 opacity-0 flex items-center justify-center group-hover:opacity-100 transition-opacity duration-300">
+                            <x-datepicker
+                                wire:model="zaposleni.{{ $loop->index }}.datum_od"
+                                x-model="$wire.zaposleni[{{ $loop->index }}].datum_od"
+                                icon="o-calendar"
+                                class="w-40"
+                            />
+                        </div>
+                    </div>
                     @endscope
 
                     @scope('cell_datum_do', $zap)
-                    <x-datepicker wire:model="zaposleni.{{ $loop->index }}.datum_do" icon="o-calendar" class="w-40" />
+                    <div class="relative w-40 group flex items-center justify-center">
+                        <!-- Display the date as text -->
+                        <span
+                            x-text="($wire.zaposleni[{{ $loop->index }}].datum_do ? new Date($wire.zaposleni[{{ $loop->index }}].datum_do).toLocaleDateString('ro-RO') : 'Nema')"
+                            class="cursor-pointer text-base">
+                        </span>
+
+                        <!-- Datepicker, initially hidden and displayed on hover -->
+                        <div class="absolute inset-0 opacity-0 flex items-center justify-center group-hover:opacity-100 transition-opacity duration-300">
+                            <x-datepicker
+                                wire:model="zaposleni.{{ $loop->index }}.datum_do"
+                                x-model="$wire.zaposleni[{{ $loop->index }}].datum_do"
+                                icon="o-calendar"
+                                class="w-40"
+                            />
+                        </div>
+                    </div>
                     @endscope
 
                     @scope('actions', $zap)
