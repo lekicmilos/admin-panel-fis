@@ -49,7 +49,7 @@
             @scope('actions', $katedra)
             <x-button
                 icon="o-trash"
-                @click="deleteModal = true; deleteId = {{ $katedra->id }}; deleteNaziv = '{{ $katedra->naziv_katedre }}'"
+                @click="deleteModal = true; deleteId = {{ $katedra->id }}; deleteNaziv = `{{ $katedra->naziv_katedre }}`"
                 class="btn-sm btn-ghost"
             />
             @endscope

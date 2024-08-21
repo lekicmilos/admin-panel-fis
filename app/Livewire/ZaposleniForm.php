@@ -12,6 +12,7 @@ use App\Services\ZaposleniService;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Mary\Traits\Toast;
@@ -50,6 +51,22 @@ class ZaposleniForm extends Component
     public $u_penziji;
     #[Validate('nullable|date|required_if:u_penziji,true')]
     public $datum_penzije;
+
+    public array $katedra_history = [];
+    public array $zvanje_history = [];
+
+//    private function mapDTOtoArray($zap)
+//    {
+//        $danas = Carbon::now();
+//
+//        return [
+//            'id' => (string)$zap?->id,
+//            'naziv' => $zap?->ime,
+//            'datum_od' => $zap?->datum_od,
+//            'datum_do' => $zap?->datum_do,
+//            'aktivan' => $zap && $zap->datum_od <= $danas && (is_null($zap->datum_do) || $zap->datum_do >= $danas),
+//        ];
+//    }
 
     public function mount($zaposleni_id = null)
     {
@@ -90,18 +107,45 @@ class ZaposleniForm extends Component
             } else {
                 $this->zvanje = ['id' => null, 'datum_od' => null, 'datum_do' => null];
             }
+
+            // fill katedra history with previous angazovnje without the active one
+            $danas = Carbon::now();
+            foreach ($zaposleniDTO->all_katedra as $item) {
+                if (!($item->datum_od <= $danas && (is_null($item->datum_do) || $item->datum_do >= $danas))) {
+                    $this->katedra_history[] = [
+                        'id' => $item->id,
+                        'naziv_katedre' => $item->naziv_katedre,
+                        'datum_od' => $item->datum_od,
+                        'datum_do' => $item->datum_do,
+                    ];
+                }
+            }
+
+            foreach ($zaposleniDTO->all_zvanje as $item) {
+                if (!($item->datum_od <= $danas && (is_null($item->datum_do) || $item->datum_do >= $danas))) {
+                    $this->zvanje_history[] = [
+                        'id' => $item->id,
+                        'naziv_zvanja' => $item->naziv_zvanja,
+                        'datum_od' => $item->datum_od,
+                        'datum_do' => $item->datum_do,
+                    ];
+                }
+            }
+
         } else {
             $this->title = 'Novi zaposleni';
         }
     }
 
-    public function rules() {
+    public function rules()
+    {
         return [
             'fis_broj' => "required|numeric|unique:zaposleni,fis_broj,$this->zaposleni_id"
         ];
     }
 
-    private function prepareDate($date) {
+    private function prepareDate($date)
+    {
         return empty($date) ? null : Carbon::parse($date)->format('Y-m-d');
     }
 
@@ -131,14 +175,36 @@ class ZaposleniForm extends Component
                 $this->prepareDate($this->zvanje['datum_od']),
                 $this->prepareDate($this->zvanje['datum_do']),
             ) : null,
+            [],
+            []
         );
 
         ZaposleniService::upsert($zaposleniDTO);
 
         $this->success(
-            "Zaposleni $this->ime $this->prezime uspešno ".($this->zaposleni_id ? 'sačuvan' : 'ažuriran')."!",
+            "Zaposleni $this->ime $this->prezime uspešno " . ($this->zaposleni_id ? 'sačuvan' : 'ažuriran') . "!",
             redirectTo: '/zaposleni'
         );
+    }
+
+    public function all_katedra_headers()
+    {
+        return [
+//            ['key' => 'id', 'label' => '#', 'hidden' => 'true'],
+            ['key' => 'naziv_katedre', 'label' => 'katedra', 'class' => 'min-w-48 text-lg'],
+            ['key' => 'datum_od', 'label' => 'datum od'],
+            ['key' => 'datum_do', 'label' => 'datum do'],
+        ];
+    }
+
+    public function all_zvanje_headers()
+    {
+        return [
+//            ['key' => 'id', 'label' => '#', 'hidden' => 'true'],
+            ['key' => 'naziv_zvanja', 'label' => 'zvanje', 'class' => 'min-w-48 text-lg'],
+            ['key' => 'datum_od', 'label' => 'datum od'],
+            ['key' => 'datum_do', 'label' => 'datum do'],
+        ];
     }
 
     public function render()
@@ -162,6 +228,7 @@ class ZaposleniForm extends Component
                 ];
             })
             ->toArray();
+
         $pol_options = [
             ['id' => 'Muski', 'name' => 'Muški'],
             ['id' => 'Zenski', 'name' => 'Ženski'],
@@ -171,7 +238,9 @@ class ZaposleniForm extends Component
                 'katedra_options' => $katedra_options,
                 'zvanje_options' => $zvanje_options,
                 'pol_options' => $pol_options,
+                'all_katedra_headers' => $this->all_katedra_headers(),
+                'all_zvanje_headers' => $this->all_zvanje_headers(),
             ]
-        );
+        )->title($this->title);
     }
 }

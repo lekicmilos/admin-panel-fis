@@ -1,4 +1,4 @@
-<div>
+<div x-data="{ deleteModal: false, deleteId: null, deleteIme: null}">
     <div class="flex flex-wrap gap-5 justify-between items-center" :class="{'blur-sm': deleteModal}">
         <h1 class="text-4xl font-bold py-4">Zaposleni</h1>
 
@@ -21,7 +21,7 @@
     <x-table
         :headers="$headers"
         :rows="$zaposleni"
-        link="zaposleni/{id}/edit"
+        link="/zaposleni/{id}/edit"
         class="shadow-lg dark:shadow-neutral table-lg"
         show-empty-text empty-text="Nisu pronađeni zaposleni."
         :sort-by="$sortBy"
@@ -43,8 +43,20 @@
         </div>
         @endscope
 
+        @scope('cell_u_penziji', $zap)
+        @if($zap->u_penziji)
+            <x-checkbox checked />
+        @else
+            <x-checkbox />
+        @endif
+        @endscope
+
         @scope('actions', $zap)
-        <x-button icon="o-trash" spinner class="btn-ghost btn-sm"/>
+        <x-button
+            icon="o-trash"
+            spinner
+            @click="deleteModal = true; deleteId = {{ $zap->id }}; deleteIme = `{{ $zap->punoIme() }}`"
+            class="btn-ghost btn-sm"/>
         @endscope
     </x-table>
 
@@ -98,4 +110,19 @@
         </x-slot:actions>
     </x-drawer>
 
+    {{--    Delete zaposleni modal--}}
+    <template x-if="deleteModal">
+        <div class="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-75">
+            <div class="bg-base-200 p-6 rounded-xl shadow-lg">
+                <div class="flex text-xl mb-5">Da li ste sigurni da želite da izbrišete zaposlenog&nbsp;<strong
+                        x-text="deleteIme"></strong> ?
+                </div>
+                <div class="flex justify-end space-x-4">
+                    <x-button label="Otkaži" @click="deleteModal = false"/>
+                    <x-button label="Potvrdi" wire:click="deleteZaposleni(deleteId); deleteModal = false;"
+                              class="btn-primary"/>
+                </div>
+            </div>
+        </div>
+    </template>
 </div>

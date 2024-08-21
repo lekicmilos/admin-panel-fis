@@ -50,8 +50,6 @@ class KatedraForm extends Component
     ])]
     public $zamenik = ['id' => null, 'datum_od' => null, 'datum_do' => null];
 
-    public array $headers;
-
     private function mapDTOtoArray(?ZaposleniNaKatedriDTO $zap)
     {
         $danas = Carbon::now();
@@ -65,16 +63,18 @@ class KatedraForm extends Component
         ];
     }
 
-    public function mount($katedra_id = null)
-    {
-        // mini table headers
-        $this->headers = [
+    // mini table headers
+    public function headers() {
+        return [
             ['key' => 'id', 'label' => '#', 'hidden' => 'true'],
-            ['key' => 'ime', 'label' => 'ime', 'class' => 'min-w-48 text-lg'],
+            ['key' => 'ime', 'label' => 'zaposleni', 'class' => 'min-w-48 text-lg'],
             ['key' => 'datum_od', 'label' => 'datum od', 'class' => 'w-32'],
             ['key' => 'datum_do', 'label' => 'datum do', 'class' => 'w-32'],
         ];
+    }
 
+    public function mount($katedra_id = null)
+    {
         // if in edit mode load the fields
         if ($katedra_id) {
            $this->title = 'Izmeni katedru';
@@ -184,6 +184,7 @@ class KatedraForm extends Component
         ];
 
         return view('livewire.katedra-form')->with([
+            'headers' => $this->headers(),
             'row_decoration' => $inactive_zaposleni_decoration,
             'all_zaposleni' => $all_zaposleni
         ]);

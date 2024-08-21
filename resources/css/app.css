@@ -3,9 +3,8 @@
 @tailwind utilities;
 
 .table {
-    @apply  table-zebra rounded-lg overflow-hidden border-accent shadow-md dark:shadow-neutral;
+    @apply table-zebra rounded-lg overflow-hidden border-accent shadow-md dark:shadow-neutral;
 }
-
 
 thead {
     @apply bg-base-300 uppercase ;
@@ -25,19 +24,6 @@ thead {
 
 .inactive-zaposleni {
     @apply italic text-yellow-700 opacity-50
-}
-
-.group:hover .group-hover\:opacity-100 {
-    opacity: 1;
-}
-.group .group-hover\:opacity-100 {
-    opacity: 0;
-}
-.group .group-hover\:opacity-100 {
-    transition: opacity 0.3s;
-}
-.group .pointer-events-auto {
-    pointer-events: auto;
 }
 
 /* Active page highlight */

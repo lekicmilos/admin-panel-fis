@@ -6,7 +6,7 @@
     <x-form wire:submit="save" x-data="{ showPenzija: $wire.u_penziji }" no-separator>
 
         <!-- Ime, Srednje Slovo, and Prezime Inputs in the Same Row -->
-        <div class="flex items-end space-x-4">
+        <div class="flex flex-wrap items-end space-x-4">
             <!-- Ime Input -->
             <div class="w-96">
                 <x-input
@@ -86,10 +86,10 @@
         </div>
 
         <!-- Katedra Selection -->
-        <div class="flex items-center space-x-4 flex-grow">
+        <div class="flex flex-wrap items-center space-x-4 flex-grow">
             <div class="w-full max-w-xs">
                 <x-select
-                    label="Katedra"
+                    label="Trenutno angažovanje"
                     :options="$katedra_options"
                     wire:model="katedra.id"
                     placeholder="--Izaberi katedru--"
@@ -109,11 +109,34 @@
             />
         </div>
 
+
+        @if (!empty($katedra_history))
+            <label class="pb-0 label label-text font-semibold">Ostala angažovanja</label>
+            <x-table
+                :headers="$all_katedra_headers"
+                :rows="$katedra_history"
+                class="table-xs w-fit"
+            >
+                @scope('cell_datum_od', $zap)
+                <div class="w-40  text-base">
+                    {{ \Carbon\Carbon::parse($zap['datum_od'])->format('d.m.Y.') }}
+                </div>
+                @endscope
+
+                @scope('cell_datum_do', $zap)
+                <div class="w-40 text-base">
+                    {{ $zap['datum_do'] ? \Carbon\Carbon::parse($zap['datum_do'])->format('d.m.Y.') : 'Nema' }}
+                </div>
+                @endscope
+            </x-table>
+        @endif
+
+
         <!-- Zvanje Selection -->
-        <div class="flex items-center space-x-4 flex-grow">
+        <div class="mt-8 flex flex-wrap items-center space-x-4 flex-grow">
             <div class="w-full max-w-xs">
                 <x-select
-                    label="Zvanje"
+                    label="Trenutno zvanje"
                     :options="$zvanje_options"
                     wire:model="zvanje.id"
                     placeholder="--Izaberi zvanje--"
@@ -132,6 +155,27 @@
                 class="w-40"
             />
         </div>
+
+        @if(!empty($zvanje_history))
+            <label class="pb-0 label label-text font-semibold">Ostala zvanja</label>
+            <x-table
+                :headers="$all_zvanje_headers"
+                :rows="$zvanje_history"
+                class="table-xs w-fit"
+            >
+                @scope('cell_datum_od', $zap)
+                <div class="w-40  text-base">
+                    {{ \Carbon\Carbon::parse($zap['datum_od'])->format('d.m.Y.') }}
+                </div>
+                @endscope
+
+                @scope('cell_datum_do', $zap)
+                <div class="w-40  text-base">
+                    {{ $zap['datum_do'] ? \Carbon\Carbon::parse($zap['datum_do'])->format('d.m.Y.') : 'Nema' }}
+                </div>
+                @endscope
+            </x-table>
+        @endif
 
         <x-slot:actions>
             <x-button label="Odustani" link='/zaposleni' class="btn-outline"/>

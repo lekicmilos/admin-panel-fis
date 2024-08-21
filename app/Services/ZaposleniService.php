@@ -18,6 +18,24 @@ class ZaposleniService
         $katedra = $zaposleni->katedra->first();
         $zvanje = $zaposleni->zvanje->first();
 
+        $katedraArray = $zaposleni->angazovanje->map(function ($item) {
+            return new KatedraZaposlenogDTO(
+                $item->id,
+                $item->naziv_katedre,
+                $item->pivot->datum_od,
+                $item->pivot->datum_do
+            );
+        })->toArray();
+
+        $zvanjeArray = $zaposleni->zvanja->map(function ($item) {
+            return new ZvanjeZaposlenogDTO(
+                $item->id,
+                $item->naziv_zvanja,
+                $item->pivot->datum_od,
+                $item->pivot->datum_do
+            );
+        })->toArray();
+
         return new ZaposleniDTO(
             $zaposleni->id,
             $zaposleni->ime,
@@ -40,6 +58,8 @@ class ZaposleniService
                 $zvanje->pivot->datum_od,
                 $zvanje->pivot->datum_do,
             ) : null,
+            $katedraArray,
+            $zvanjeArray
         );
     }
 
@@ -71,7 +91,8 @@ class ZaposleniService
         }
     }
 
-    public static function upsertZvanje(Zaposleni $zaposleni, ZvanjeZaposlenogDTO $zvanjeDTO) {
+    public static function upsertZvanje(Zaposleni $zaposleni, ZvanjeZaposlenogDTO $zvanjeDTO)
+    {
         $table_name = 'izbor_u_zvanje';
         // nadji prethodne izbore istog zvanja zaposlenog
         $prethodna = $zaposleni->zvanja()->where('zvanje_id', $zvanjeDTO->id)->get();

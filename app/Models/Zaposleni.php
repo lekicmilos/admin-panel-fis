@@ -25,6 +25,7 @@ class Zaposleni extends Model
         "fis_broj",
         "u_penziji",
         "datum_penzije",
+        'active'
     ];
 
     public function punoIme()

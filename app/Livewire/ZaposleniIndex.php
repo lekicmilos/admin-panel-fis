@@ -39,7 +39,8 @@ class ZaposleniIndex extends Component
             ['key' => 'ime', 'label' => 'Ime i prezime', 'class' => 'font-bold text-lg'],
             ['key' => 'email', 'label' => 'Email'],
             ['key' => 'katedra', 'label' => 'Katedra', 'sortable' => false],
-            ['key' => 'zvanje', 'label' => 'Zvanje', 'sortable' => false]
+            ['key' => 'zvanje', 'label' => 'Zvanje', 'sortable' => false],
+            ['key' => 'u_penziji', 'label' => 'U penziji']
         ];
     }
 
@@ -84,7 +85,9 @@ class ZaposleniIndex extends Component
 
     public function deleteZaposleni($zaposleni_id)
     {
-        //
+        $zaposleni = Zaposleni::findOrFail($zaposleni_id);
+        $zaposleni->update(['active' => 0]);
+        $this->success('Zaposleni '.$zaposleni->punoIme().' uspešno obirsan.');
     }
 
     public function render()

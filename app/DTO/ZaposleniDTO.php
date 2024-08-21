@@ -17,6 +17,8 @@ readonly class ZaposleniDTO
         public ?string $datum_penzije,
         public ?KatedraZaposlenogDTO $katedra,
         public ?ZvanjeZaposlenogDTO $zvanje,
+        public array $all_katedra, //KatedraZaposlenogDTO
+        public array $all_zvanje, //ZvanjeZaposlenogDTO
     )
     {
     }
